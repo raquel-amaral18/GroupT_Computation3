@@ -1,7 +1,6 @@
 import pygame
 
 from game import game
-from multiplayer import gameMP
 
 
 def interface():
@@ -47,10 +46,9 @@ def interface():
     # Drawing the screen
     while True:
         mouse = pygame.mouse.get_pos()  # Stores in a tuple all the positions of the mouse
-        keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
-            if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
+            if event.type == pygame.QUIT:
                 pygame.quit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -59,7 +57,8 @@ def interface():
                     game()
                 if screen_width - box_width - box_margin <= mouse[0] <= screen_width - box_margin \
                         and 400 <= mouse[1] <= 400 + box_height:
-                    gameMP()
+                    # Add multiplayer function here
+                    pass
                 if screen_width - box_width - box_margin <= mouse[0] <= screen_width - box_margin \
                         and 500 <= mouse[1] <= 500 + box_height:
                     credits_()
@@ -128,49 +127,26 @@ def credits_():
     BLUE = (0, 180, 216)
 
     # font
-    title_font = pygame.font.SysFont('monospace', 50)
-    credits_font = pygame.font.SysFont('monospace', 25)
+    corbelfont = pygame.font.SysFont('Corbel', 50)
+    comicsansfont = pygame.font.SysFont('Comic Sans MS', 25)
 
     # text
-    title = title_font.render("Credits", True, WHITE)
-    credits_Gui = credits_font.render("Guilherme Marques 20221780", True, YELLOW)
-    credits_Rafa = credits_font.render("Rafael Ribeiro 20221853", True, YELLOW)
-    credits_Raquel = credits_font.render("Raquel Amaral, 20221844", True, YELLOW)
-    go_back = title_font.render("X", True, WHITE)
+    title = corbelfont.render("Credits", True, WHITE)
+    credits_1 = comicsansfont.render("Raquel Amaral", True, YELLOW)
 
-    # Boxes dimensions
-    box_width = 75
-    box_height = 50
-    box_margin = 50
-
+    carryOn = True
     # Drawing the screen
-    while True:
+    while carryOn:
         mouse = pygame.mouse.get_pos()  # Stores in a tuple all the positions of the mouse
-        keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
-            if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
-                pygame.quit()
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if screen_width - box_width - box_margin <= mouse[0] <= screen_width - box_margin \
-                        and 600 <= mouse[1] <= 600 + box_height:
-                    interface()
+            if event.type == pygame.QUIT:
+                carryOn = False
 
         screen.fill(BLACK)
 
         screen.blit(title, (100, 100))
-        screen.blit(credits_Gui, (100, 200))
-        screen.blit(credits_Rafa, (100, 250))
-        screen.blit(credits_Raquel, (100, 300))
-
-        pygame.draw.rect(screen,
-                         GREEN if (screen_width - box_width - box_margin <= mouse[0] <= screen_width - box_margin
-                                   and 600 <= mouse[1] <= 600 + box_height) else RED,
-                         [screen_width - box_width - box_margin, 600, box_width, box_height])
-        screen.blit(go_back,
-                    (screen_width - box_width - box_margin + (box_width - go_back.get_width()) // 2,
-                     600 + (box_height - go_back.get_height()) // 2))
+        screen.blit(credits_1, (100, 200))
 
 
         pygame.display.update()
