@@ -4,8 +4,6 @@ import random
 import pygame
 
 from car import *
-from messages import *
-
 
 def gameMP():
 
@@ -14,7 +12,7 @@ def gameMP():
     # EXTERNAL WINDOW:
     # Set up the screen
     screen_width = 700
-    screen_height = 600
+    screen_height = 500
     screen = pygame.display.set_mode((screen_width, screen_height))  # Amount of pixels that compose size of the window
     pygame.display.set_caption("Car Racing Game")
 
@@ -23,24 +21,30 @@ def gameMP():
     # colors
     GREY = (80, 80, 80)
     WHITE = (255, 255, 255)
+    GREEN = (48, 168, 99)
+    PALE_VIOLET_PINK = (240, 98, 146)
     RED = (249, 65, 68)
+    VIOLET = (199, 125, 255)
+    YELLOW = (255, 209, 102)
+    ORANGE = (251, 133, 0)
     BLUE = (0, 180, 216)
 
-    # Font
-    arialfont_timer = pygame.font.SysFont('monospace', 20, bold=True)
-    message_font = pygame.font.SysFont('monospace', 30, bold=True)
-    messages_group = pygame.sprite.Group()
+    cars_color = [RED, VIOLET, YELLOW, ORANGE, BLUE]
 
-    # RIBBON - PAUSE, TIMER AND LIFE COUNTER:
-    # Pause button
-    pause_img = pygame.image.load("Images/pause.png").convert()
-    pause_img = pygame.transform.scale(pause_img, (20, 20))
+    # Font
+    arialfont_timer = pygame.font.SysFont('arial', 25)
+    arialfont_lives = pygame.font.SysFont('arial', 100)
+
+
+    # RIBBON - TIMER AND LIFE COUNTER:
     # Timer
     start_timer = pygame.time.get_ticks()
     # Lives
     heart_img = pygame.image.load("Images/heart.png").convert()
     heart_img = pygame.transform.scale(heart_img, (20, 20))
-    lives_player1, lives_player2 = 3, 3
+    lives = 3
+
+    lives_player2 = 3  # Number of lives for player 2
 
     # ENVIRONMENTS:
     # Forest
@@ -63,64 +67,74 @@ def gameMP():
 
     # VEHICLES:
     # Player 1 car
-    playerCar1 = PlayerCar("Images/00C.png", 50)
-    playerCar1.rect.x = (screen_width - playerCar1.rect.width) // 2 - 50  # which column the car starts
-    playerCar1.rect.y = 450  # which row the car starts
+    playerCar = PlayerCar(PALE_VIOLET_PINK, 40, 70)  # Color, width, length
+    playerCar.rect.x = (screen_width - playerCar.rect.width) // 2 - 50  # which column the car starts
+    playerCar.rect.y = 400  # which row the car starts
 
     # Player 2 car
-    playerCar2 = PlayerCar("Images/01C.png", 50)
-    playerCar2.rect.x = (screen_width - playerCar2.rect.width) // 2 + 50  # which column the car starts
-    playerCar2.rect.y = 450  # which row the car starts
+    playerCar2 = PlayerCar(PALE_VIOLET_PINK, 40, 70)  # Color, width, length
+    playerCar2.rect.x = (screen_width - playerCar2.rect.width) // 2 + 50 # which column the car starts
+    playerCar2.rect.y = 400  # which row the car starts
 
     # Opponent cars
-    car1 = IncomingCars("Images/03C.png", 50, 2, road_x + (lane_width - 50) // 2)
-    car2 = IncomingCars("Images/02C.png", 50, 4, road_x + lane_width + (lane_width - 50) // 2)
-    car3 = IncomingCars("Images/05C.png", 50, 3, road_x + (2 * lane_width) + (lane_width - 50) // 2)
-    car4 = IncomingCars("Images/07C.png", 50, 1, road_x + (3 * lane_width) + (lane_width - 50) // 2)
+    car1 = IncomingCars(RED, 40, 70, 2)
+    car1.rect.x = road_x + (lane_width - car1.rect.width) // 2
+    car1.rect.y = -300
+
+    car2 = IncomingCars(YELLOW, 40, 70, 4)
+    car2.rect.x = road_x + lane_width + (lane_width - car2.rect.width) // 2
+    car2.rect.y = -654
+
+    car3 = IncomingCars(VIOLET, 40, 70, 3)
+    car3.rect.x = road_x + (2 * lane_width) + (lane_width - car3.rect.width) // 2
+    car3.rect.y = -795
+
+    car4 = IncomingCars(ORANGE, 40, 70, 1)
+    car4.rect.x = road_x + (3 * lane_width) + (lane_width - car4.rect.width) // 2
+    car4.rect.y = -476
 
     all_sprites_list = pygame.sprite.Group()
     incoming_cars_list = pygame.sprite.Group()
-    player_car1_list = pygame.sprite.Group()
-    player_car2_list = pygame.sprite.Group()
+    player_car_list = pygame.sprite.Group()
 
-    all_sprites_list.add(playerCar1, playerCar2, car1, car2, car3, car4)  # To show the cars on the screen
+    all_sprites_list.add(playerCar, playerCar2, car1, car2, car3, car4)  # To show the cars on the screen
     incoming_cars_list.add(car1, car2, car3, car4)
-    player_car1_list.add(playerCar1)
-    player_car2_list.add(playerCar2)
+    player_car_list.add(playerCar, playerCar2)
 
     carryOn = True
 
     # Controls whether the player's input should or not be considered
     movement_enabled = True
 
+    playerCar_speed = 3  # When this value is increased, ALL the incoming cars come faster
+
     clock = pygame.time.Clock()  # How fast the screen resets (how many times you repeat the loop per second)
 
     # Game loop:
     while carryOn:
-        mouse = pygame.mouse.get_pos()
-        keys = pygame.key.get_pressed()
         for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
-            if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:  # pygame.quit() checks if we pressed the red X (to leave the app)
+            if event.type == pygame.QUIT:  # pygame.quit() checks if we pressed the red X (to leave the app)
                 carryOn = False
 
         if movement_enabled:
             # Move player 1 car (with input from the user):
+            keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
-                playerCar1.moveLeft(5)
+                playerCar.moveLeft(5)
                 # Ensure the player's car stays within the left boundary of the road
-                playerCar1.rect.x = max(road_x, playerCar1.rect.x)
+                playerCar.rect.x = max(road_x, playerCar.rect.x)
             if keys[pygame.K_RIGHT]:
-                playerCar1.moveRight(5)
+                playerCar.moveRight(5)
                 # Ensure the player's car stays within the right boundary of the road
-                playerCar1.rect.x = min(road_x + road_width - playerCar1.rect.width, playerCar1.rect.x)
+                playerCar.rect.x = min(road_x + road_width - playerCar.rect.width, playerCar.rect.x)
             if keys[pygame.K_UP]:
-                playerCar1.moveUp(5)
+                playerCar.moveUp(5)
                 # Ensure the player's car stays within the top boundary of the road
-                playerCar1.rect.y = max(0, playerCar1.rect.y)
+                playerCar.rect.y = max(0, playerCar.rect.y)
             if keys[pygame.K_DOWN]:
-                playerCar1.moveDown(5)
+                playerCar.moveDown(5)
                 # Ensure the player's car stays within the bottom boundary of the road
-                playerCar1.rect.y = min(screen_height - playerCar1.rect.height, playerCar1.rect.y)
+                playerCar.rect.y = min(screen_height - playerCar.rect.height, playerCar.rect.y)
 
             # Movement for player 2
             if keys[pygame.K_a]:  # Left
@@ -138,7 +152,7 @@ def gameMP():
 
         # screen.fill(GREEN)
         # Draw background
-        screen.blit(forest_background, (0, 0))
+        screen.blit(space_background, (0, 0))
 
         pygame.draw.rect(screen, GREY, [road_x, 0, road_width, screen_height])
 
@@ -147,51 +161,48 @@ def gameMP():
         pygame.draw.line(screen, WHITE, [middle_line_x, 0], [middle_line_x, screen_height], 6)  # Central double line
 
         dashed_lines_x = [road_x + (i * lane_width) for i in range(1, num_lanes)]
-
-        # Calculate the offset based on the player's car speed
-        offset_y = (pygame.time.get_ticks() // 10) % 40
         for line_x in dashed_lines_x:
             for line_y in range(0, screen_height, 40):
                 pygame.draw.line(screen, WHITE, [line_x, line_y], [line_x, line_y + 20], 1)
 
         # Draw the cars
         incoming_cars_list.draw(screen)
-        if playerCar1.visible:
-            player_car1_list.draw(screen)
-        if playerCar2.visible:
-            player_car2_list.draw(screen)
+        if playerCar.visible:
+            player_car_list.draw(screen)
 
         # Move the opponent cars (automatically):
         for car in incoming_cars_list:
             # Velocity
-            car.moveDown(playerCar1.speed)
+            car.moveDown(playerCar_speed)
             # When the cars go out of the screen, we move them up again
             if car.rect.y >= screen_height:
-                car.reshape()
+                car.rect.y = random.randint(-1000, 0)
+                car.repaint(random.choice(cars_color))
+                car.reshape(random.randint(30, 50), random.randint(60, 90))
+                car.change_speed(random.randint(3, 5))
 
-        # Handle collisions with PlayerCar1
+        #  car_collision_list = pygame.sprite.spritecollide(playerCar, incoming_cars_list, False)  # If True --> Pacman
+        # if len(car_collision_list) > 0:
+            # carryOn = False
         for car in incoming_cars_list:
-            if not playerCar1.invincible and pygame.sprite.collide_mask(playerCar1, car) is not None:
+            if not playerCar.invincible and pygame.sprite.collide_mask(playerCar, car) is not None:
                 # Collision detected
-                lives_player1 -= 1
-                show_message(messages_group, "-1", message_font, (playerCar1.rect.x, playerCar1.rect.y), BLUE)
+                lives -= 1
                 # Activate invincibility for 5 seconds after collision
-                playerCar1.invincible = True
+                playerCar.invincible = True
                 invincibility_start_time = pygame.time.get_ticks()
                 invincibility_duration = 2000
                 # Reset player's car position
-                playerCar1.rect.x = (screen_width - playerCar1.rect.width) // 2 - 50
-                playerCar1.rect.y = 400
+                playerCar.rect.x = (screen_width - playerCar.rect.width) // 2
+                playerCar.rect.y = 400
                 # If no lives left --> end the game
-                if lives_player1 == 0:
+                if lives == 0:
                     carryOn = False
 
-        # Handle collisions with PlayerCar1
         for car in incoming_cars_list:
             if not playerCar2.invincible and pygame.sprite.collide_mask(playerCar2, car) is not None:
                 # Collision detected for player 2
                 lives_player2 -= 1
-                show_message(messages_group, "-1", message_font, (playerCar2.rect.x, playerCar2.rect.y), RED)
                 # Activate invincibility for 5 seconds after collision for player 2
                 playerCar2.invincible = True
                 invincibility_start_time_player2 = pygame.time.get_ticks()
@@ -204,15 +215,18 @@ def gameMP():
                     carryOn = False
 
         # Update invincibility status based on elapsed time
+
         #Player car 1
-        if playerCar1.invincible:
+        if playerCar.invincible:
             elapsed_time = pygame.time.get_ticks() - invincibility_start_time
             toggle_interval = 200
             if elapsed_time >= invincibility_duration:
-                playerCar1.invincible = False
-                playerCar1.visible = True
+                playerCar.invincible = False
+                playerCar.visible = True
+                movement_enabled = True
             else:
-                playerCar1.visible = (elapsed_time // toggle_interval) % 2 == 0
+                playerCar.visible = (elapsed_time // toggle_interval) % 2 == 0
+                movement_enabled = True
 
         #Player car 2
         if playerCar2.invincible:
@@ -221,14 +235,15 @@ def gameMP():
             if elapsed_time >= invincibility_duration_player2:
                 playerCar2.invincible = False
                 playerCar2.visible = True
+                movement_enabled = True
             else:
                 playerCar2.visible = (elapsed_time // toggle_interval) % 2 == 0
+                movement_enabled = True
 
         all_sprites_list.update()
 
         # Draw the black ribbon for the game settings
         pygame.draw.rect(screen, (0, 0, 0), [0, 0, screen_width, 30])
-
         # Update timer
         elapsed_time = pygame.time.get_ticks() // 1000
         minutes, seconds = divmod(elapsed_time, 60)  # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
@@ -243,15 +258,301 @@ def gameMP():
         # Update lives
 
         #Player 1 lives
-        for i in range(lives_player1):
+        for i in range(lives):
             screen.blit(heart_img, (screen_width - 40 - i * 35, 5))
         #Player 2 lives
         for i in range(lives_player2):
             screen.blit(heart_img, (10 + i * 35, 5))
 
-        # Draw and update messages
-        messages_group.draw(screen)
-        messages_group.update()
+
+        pygame.display.flip()  # Refresh the screen
+        clock.tick(60)  # 60 frame per millisecond
+
+    pygame.quit()  # Terminate the pygame
+
+def gameMP2roads():
+
+    pygame.init()  # Initialize the pygame
+
+    # EXTERNAL WINDOW:
+    # Set up the screen
+    screen_width = 1400
+    screen_height = 500
+    screen = pygame.display.set_mode((screen_width, screen_height))  # Amount of pixels that compose size of the window
+    pygame.display.set_caption("Car Racing Game")
+
+
+    # GAME SETTINGS:
+    # colors
+    GREY = (80, 80, 80)
+    WHITE = (255, 255, 255)
+    GREEN = (48, 168, 99)
+    PALE_VIOLET_PINK = (240, 98, 146)
+    RED = (249, 65, 68)
+    VIOLET = (199, 125, 255)
+    YELLOW = (255, 209, 102)
+    ORANGE = (251, 133, 0)
+    BLUE = (0, 180, 216)
+
+    cars_color = [RED, VIOLET, YELLOW, ORANGE, BLUE]
+
+    # Font
+    arialfont_timer = pygame.font.SysFont('arial', 25)
+    arialfont_lives = pygame.font.SysFont('arial', 100)
+
+
+    # RIBBON - TIMER AND LIFE COUNTER:
+    # Timer
+    start_timer = pygame.time.get_ticks()
+    # Lives
+    heart_img = pygame.image.load("Images/heart.png").convert()
+    heart_img = pygame.transform.scale(heart_img, (20, 20))
+
+    lives = 3  # Number of lives for player 2
+
+    lives_player2 = 3  # Number of lives for player 2
+
+    # ENVIRONMENTS:
+    # Forest
+    forest_background = pygame.image.load("Images/forest.jpg").convert()
+    forest_background = pygame.transform.scale(forest_background, (screen_width, screen_height))
+    # Underwater
+    underwater_background = pygame.image.load("Images/underwater.jpg").convert()
+    underwater_background = pygame.transform.scale(underwater_background, (screen_width, screen_height))
+    # Space
+    space_background = pygame.image.load("Images/space.jpeg").convert()
+    space_background = pygame.transform.scale(space_background, (screen_width, screen_height))
+
+    # ROAD Player 1 (Left Side):
+    num_lanes = 4  # Number of lanes
+    road_width = 350  # Width of the road
+    lane_width = road_width / num_lanes
+
+    # Center of the left half of the screen
+    left_road_center = screen_width / 4
+    # Positioning the road in the middle of the left half
+    road_x_left = left_road_center - (road_width / 2)
+
+    # ROAD Player 2 (Right Side):
+    # Center of the right half of the screen
+    right_road_center = 3 * screen_width / 4
+    # Positioning the road in the middle of the right half
+    road_x_right = right_road_center - (road_width / 2)
+
+
+    # VEHICLES:
+    # Player 1 car
+    playerCar = PlayerCar(PALE_VIOLET_PINK, 40, 70)
+    playerCar.rect.x = right_road_center - (playerCar.rect.width // 2)  # Center on the right road
+    playerCar.rect.y = 400
+
+    # Player 2 car
+    playerCar2 = PlayerCar(PALE_VIOLET_PINK, 40, 70)
+    playerCar2.rect.x = left_road_center - (playerCar2.rect.width // 2)  # Center on the left road
+    playerCar2.rect.y = 400
+
+    # Opponent cars
+    car1 = IncomingCars(RED, 40, 70, 2)
+    car1.rect.x = road_x_left + (lane_width - car1.rect.width) // 2
+    car1.rect.y = -300
+
+    car2 = IncomingCars(YELLOW, 40, 70, 4)
+    car2.rect.x = road_x_left + lane_width + (lane_width - car2.rect.width) // 2
+    car2.rect.y = -654
+
+    car3 = IncomingCars(VIOLET, 40, 70, 3)
+    car3.rect.x = road_x_left + (2 * lane_width) + (lane_width - car3.rect.width) // 2
+    car3.rect.y = -795
+
+    car4 = IncomingCars(ORANGE, 40, 70, 1)
+    car4.rect.x = road_x_left + (3 * lane_width) + (lane_width - car4.rect.width) // 2
+    car4.rect.y = -476
+
+    car5 = IncomingCars(RED, 40, 70, 2)
+    car5.rect.x = road_x_right + (lane_width - car5.rect.width) // 2
+    car5.rect.y = -300
+
+    car6 = IncomingCars(YELLOW, 40, 70, 4)
+    car6.rect.x = road_x_right + lane_width + (lane_width - car6.rect.width) // 2
+    car6.rect.y = -654
+
+    car7 = IncomingCars(VIOLET, 40, 70, 3)
+    car7.rect.x = road_x_right + (2 * lane_width) + (lane_width - car7.rect.width) // 2
+    car7.rect.y = -795
+
+    car8 = IncomingCars(ORANGE, 40, 70, 1)
+    car8.rect.x = road_x_right + (3 * lane_width) + (lane_width - car8.rect.width) // 2
+    car8.rect.y = -476
+
+    all_sprites_list = pygame.sprite.Group()
+    incoming_cars_list = pygame.sprite.Group()
+    player_car_list = pygame.sprite.Group()
+
+    all_sprites_list.add(playerCar, playerCar2, car1, car2, car3, car4, car5, car7, car8 )  # To show the cars on the screen
+    incoming_cars_list.add(car1, car2, car3, car4, car5, car6, car7, car8)
+    player_car_list.add(playerCar, playerCar2)
+
+    carryOn = True
+
+    # Controls whether the player's input should or not be considered
+    movement_enabled = True
+
+    playerCar_speed = 3  # When this value is increased, ALL the incoming cars come faster
+
+    clock = pygame.time.Clock()  # How fast the screen resets (how many times you repeat the loop per second)
+
+    playerCar.invincible = False
+    playerCar2.invincible = False
+    invincibility_duration = 2000
+    toggle_interval = 200
+
+    # Game loop:
+    while carryOn:
+        for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
+            if event.type == pygame.QUIT:  # pygame.quit() checks if we pressed the red X (to leave the app)
+                carryOn = False
+
+        if movement_enabled:
+            # Move player 1 car (with input from the user):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                playerCar.moveLeft(5)
+                # Ensure the player's car stays within the left boundary of the right road
+                playerCar.rect.x = max(road_x_right, playerCar.rect.x)
+            if keys[pygame.K_RIGHT]:
+                playerCar.moveRight(5)
+                # Ensure the player's car stays within the right boundary of the right road
+                playerCar.rect.x = min(road_x_right + road_width - playerCar.rect.width, playerCar.rect.x)
+            if keys[pygame.K_UP]:
+                playerCar.moveUp(5)
+                # Ensure the player's car stays within the top boundary of the road
+                playerCar.rect.y = max(0, playerCar.rect.y)
+            if keys[pygame.K_DOWN]:
+                playerCar.moveDown(5)
+                # Ensure the player's car stays within the bottom boundary of the road
+                playerCar.rect.y = min(screen_height - playerCar.rect.height, playerCar.rect.y)
+
+            # Movement for player 2
+            if keys[pygame.K_a]:  # Left
+                playerCar2.moveLeft(5)
+                # Ensure the player's car stays within the left boundary of the left road
+                playerCar2.rect.x = max(road_x_left, playerCar2.rect.x)
+            if keys[pygame.K_d]:  # Right
+                playerCar2.moveRight(5)
+                # Ensure the player's car stays within the right boundary of the left road
+                playerCar2.rect.x = min(road_x_left + road_width - playerCar2.rect.width, playerCar2.rect.x)
+            if keys[pygame.K_w]:  # Up
+                playerCar2.moveUp(5)
+                playerCar2.rect.y = max(0, playerCar2.rect.y)
+            if keys[pygame.K_s]:  # Down
+                playerCar2.moveDown(5)
+                playerCar2.rect.y = min(screen_height - playerCar2.rect.height, playerCar2.rect.y)
+
+        # screen.fill(GREEN)
+        # Draw background
+        screen.blit(space_background, (0, 0))
+
+        pygame.draw.rect(screen, GREY, [road_x_left, 0, road_width, screen_height])  # Left Road
+        pygame.draw.rect(screen, GREY, [road_x_right, 0, road_width, screen_height])  # Right Road
+
+        # Draw road markings for the left road
+        dashed_lines_x_left = [road_x_left + (i * lane_width) for i in range(1, num_lanes)]
+        for line_x in dashed_lines_x_left:
+            for line_y in range(0, screen_height, 40):
+                pygame.draw.line(screen, WHITE, [line_x, line_y], [line_x, line_y + 20], 1)
+
+        # Draw road markings for the right road
+        dashed_lines_x_right = [road_x_right + (i * lane_width) for i in range(1, num_lanes)]
+        for line_x in dashed_lines_x_right:
+            for line_y in range(0, screen_height, 40):
+                pygame.draw.line(screen, WHITE, [line_x, line_y], [line_x, line_y + 20], 1)
+
+        # Draw the cars
+        incoming_cars_list.draw(screen)
+        if playerCar.visible:
+            player_car_list.draw(screen)
+
+        # Move the opponent cars (automatically):
+        for car in incoming_cars_list:
+            # Velocity
+            car.moveDown(playerCar_speed)
+            # Reset cars position when they go off-screen
+            if car.rect.y >= screen_height:
+                car.rect.y = random.randint(-1000, 0)
+                car.repaint(random.choice(cars_color))
+                car.reshape(random.randint(30, 50), random.randint(60, 90))
+                car.change_speed(random.randint(3, 5))
+
+        #  car_collision_list = pygame.sprite.spritecollide(playerCar, incoming_cars_list, False)  # If True --> Pacman
+        # if len(car_collision_list) > 0:
+            # carryOn = False
+
+        # Collision detection and handling for Player 1 Car
+        if not playerCar.invincible:
+            for car in incoming_cars_list:
+                if pygame.sprite.collide_mask(playerCar, car) is not None:
+                    lives -= 1
+                    playerCar.invincible = True
+                    playerCar.invincibility_start_time = pygame.time.get_ticks()
+                    playerCar.rect.x = right_road_center - (playerCar.rect.width // 2)
+                    playerCar.rect.y = 400
+                    if lives == 0:
+                        carryOn = False
+
+        # Collision detection and handling for Player 2 Car
+        if not playerCar2.invincible:
+            for car in incoming_cars_list:
+                if pygame.sprite.collide_mask(playerCar2, car) is not None:
+                    lives_player2 -= 1
+                    playerCar2.invincible = True
+                    playerCar2.invincibility_start_time = pygame.time.get_ticks()
+                    playerCar2.rect.x = left_road_center - (playerCar2.rect.width // 2)
+                    playerCar2.rect.y = 400
+                    if lives_player2 == 0:
+                        carryOn = False
+
+        # Update invincibility status and blinking for Player 1 Car
+        if playerCar.invincible:
+            elapsed_time = pygame.time.get_ticks() - playerCar.invincibility_start_time
+            if elapsed_time >= invincibility_duration:
+                playerCar.invincible = False
+                playerCar.visible = True
+            else:
+                playerCar.visible = (elapsed_time // toggle_interval) % 2 == 0
+
+        # Update invincibility status and blinking for Player 2 Car
+        if playerCar2.invincible:
+            elapsed_time = pygame.time.get_ticks() - playerCar2.invincibility_start_time
+            if elapsed_time >= invincibility_duration:
+                playerCar2.invincible = False
+                playerCar2.visible = True
+            else:
+                playerCar2.visible = (elapsed_time // toggle_interval) % 2 == 0
+
+        all_sprites_list.update()
+
+        # Draw the black ribbon for the game settings
+        pygame.draw.rect(screen, (0, 0, 0), [0, 0, screen_width, 30])
+        # Update timer
+        elapsed_time = pygame.time.get_ticks() // 1000
+        minutes, seconds = divmod(elapsed_time, 60)  # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
+                                                    #The quotient --> minutes, and the remainder --> seconds
+                                                    # The result is unpacked into the minutes and seconds variables
+        timer_text = arialfont_timer.render("{:02}:{:02}".format(minutes, seconds), True, WHITE)
+
+        # Calculate the x-coordinate to center the text
+        timer_x = (screen_width - timer_text.get_width()) // 2
+        screen.blit(timer_text, (timer_x, 0))
+
+        # Update lives
+
+        #Player 1 lives
+        for i in range(lives):
+            screen.blit(heart_img, (screen_width - 40 - i * 35, 5))
+        #Player 2 lives
+        for i in range(lives_player2):
+            screen.blit(heart_img, (10 + i * 35, 5))
+
 
         pygame.display.flip()  # Refresh the screen
         clock.tick(60)  # 60 frame per millisecond
