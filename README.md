@@ -1,8 +1,3 @@
-<!-- PROJECT SHIELDS -->
-[![Contributors][contributors-shield]][https://github.com/raquel-amaral18/GroupT_Computation3/graphs/contributors]
-[![Issues][issues-shield]][https://github.com/raquel-amaral18/GroupT_Computation3/issues]
-[![MIT License][license-shield]][https://github.com/raquel-amaral18/GroupT_Computation3/blob/main/LICENSE]
-
 <!-- ABOUT THE PROJECT -->
 ## Rush Hour: The Race
 <br />

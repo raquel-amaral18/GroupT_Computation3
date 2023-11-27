@@ -17,7 +17,6 @@ class Car(pygame.sprite.Sprite, ABC):
         A class representing a car in the game.
 
         ...
-
         Attributes
         ----------
             image_path : str
@@ -80,7 +79,7 @@ class PlayerCar(Car):
 
         Attributes
         ----------
-            invincible: bool
+            ghost: bool
                 indicates if the player's car is invincible
             visible: bool
                 indicates if the player's car is visible
@@ -98,7 +97,7 @@ class PlayerCar(Car):
             change_speed(self, speed):
                 overrides the base class method to change the speed of the player's car
     """
-    def __init__(self, image_path, width, speed=0):
+    def __init__(self, image_path, width, lives, speed=0):
         """
             Constructs the attributes for the PlayerCar object.
 
@@ -112,9 +111,12 @@ class PlayerCar(Car):
                     the initial speed of the player's car
         """
         super().__init__(image_path, width, speed)
-        self.invincible = False
+        self.ghost = False
         self.visible = True
-        self.speed = 2
+
+        self.lives = lives
+
+        self.speed = 3
 
     # The position of the car is (self.rect.x, self.rect.y)
     def moveRight(self, pixels):
