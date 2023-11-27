@@ -25,7 +25,7 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
     WHITE = (255, 255, 255)
     RED = (249, 65, 68)
     BLUE = (0, 180, 216)
-
+    
     # Font
     timer_font = pygame.font.SysFont('monospace', 20, bold=True)
     message_font = pygame.font.SysFont('monospace', 30, bold=True)
