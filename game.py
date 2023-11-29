@@ -1,16 +1,20 @@
-import random
-# pygame.org
-# pygame works as an old movie that never ends and repeats itself forever (until you die)
-import pygame
 
+import random
+import pygame
 from car import *
 from coins import Coin
 from messages import *
+from pause import display_pause_menu
 
+is_game_paused = False
+accessed_from_pause = False
 
 def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     pygame.init()  # Initialize the pygame
+
+    # Pause Menu State
+    paused = False
 
     # EXTERNAL WINDOW:
     # Set up the screen
@@ -105,6 +109,31 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
             if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:  # pygame.quit() checks if we pressed the red X (to leave the app)
                 carryOn = False
 
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    carryOn = False
+                elif event.key == pygame.K_p:
+                    paused = not paused  # Toggle pause state
+
+
+
+        if paused:
+            resume_button, how_to_play_button, credits_button, quit_button = display_pause_menu(screen)
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if resume_button.is_clicked(event.pos):
+                        paused = False  # Resume game
+                    elif how_to_play_button.is_clicked(event.pos):
+                        from instructions import instructions3_
+                        instructions3_(SCREEN_WIDTH, SCREEN_HEIGHT)
+                        pause = False
+                    elif credits_button.is_clicked(event.pos):
+                        paused = False  # Resume game
+                    elif quit_button.is_clicked(event.pos):
+                        from interface import interface
+                        interface()  # Quit game
+            continue  # Skip the rest of the game loop when paused
         if movement_enabled:
             # Move player's car (with input from the user):
             if keys[pygame.K_LEFT]:

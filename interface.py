@@ -53,12 +53,13 @@ def interface():
                 if 310 <= mouse[0] <= 580 and 470 <= mouse[1] <= 550:
                     game(SCREEN_WIDTH, SCREEN_HEIGHT)
                 if 345 <= mouse[0] <= 545 and 570 <= mouse[1] <= 650:
-                    gameMP(SCREEN_WIDTH, SCREEN_HEIGHT)
+                    multiplayermenu(SCREEN_WIDTH, SCREEN_HEIGHT)
                     # gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT)
                 if 90 <= mouse[0] <= 290 and 500 <= mouse[1] <= 560:
                     # Store
                     pass
                 if 90 <= mouse[0] <= 290 and 600 <= mouse[1] <= 660:
+                    from instructions import instructions1_
                     instructions1_(SCREEN_WIDTH, SCREEN_HEIGHT)
                 if 610 <= mouse[0] <= 810 and 500 <= mouse[1] <= 560:
                     credits_(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -177,10 +178,9 @@ def credits_(SCREEN_WIDTH, SCREEN_HEIGHT):
 
         pygame.display.update()
 
-
-def instructions1_(SCREEN_WIDTH, SCREEN_HEIGHT):
+def multiplayermenu(SCREEN_WIDTH, SCREEN_HEIGHT):
     pygame.init()  # Initialize the pygame
-
+    from button import Button
     # EXTERNAL WINDOW:
     # Set up the screen
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -191,9 +191,42 @@ def instructions1_(SCREEN_WIDTH, SCREEN_HEIGHT):
     LIGHT_BLUE = (65, 163, 187)
     DARK_BLUE = (27, 148, 153)
 
+    back_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30).render("BACK", True, BLACK)
+
     # Background
-    background = pygame.image.load("Images/instructions (1).png")
+    background = pygame.image.load("Images/BackgroundMP.png")
     original_width, original_height = background.get_size()
+
+    # Draw Pause Menu Text
+    font = pygame.font.SysFont('monospace', 50, bold=True)
+    text = font.render('Paused', True, WHITE)
+    text_rect = text.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2))
+    screen.blit(text, text_rect)
+
+
+    # Button dimensions and positioning
+    button_width, button_height = 150, 60  # Increase width and height
+    horizontal_spacing, vertical_spacing = 30, 20  # Increase spacing
+    total_width = 2 * button_width + horizontal_spacing
+    # Adjusted button positions
+    start_x = (screen.get_width() - total_width) / 2
+    start_y = text_rect.bottom + 60  # Increase the starting y-position
+    center_x = (SCREEN_WIDTH - button_width) // 2
+    bottom_y = SCREEN_HEIGHT - button_height - 20
+
+    # Create buttons
+    Single_road_button = Button("Single Road Fun", start_x, start_y, button_width, button_height)
+    Two_Player_button = Button("2 Players, 2 Roads", start_x + button_width + horizontal_spacing, start_y, button_width, button_height)
+    credits_button = Button("Credits", start_x, start_y + button_height + vertical_spacing, button_width, button_height)
+    quit_button = Button("Quit", start_x + button_width + horizontal_spacing, start_y + button_height + vertical_spacing, button_width, button_height)
+    back_button = Button("Back", center_x, bottom_y, button_width, button_height)
+
+    # Draw buttons
+    Single_road_button.draw(screen)
+    Two_Player_button.draw(screen)
+    credits_button.draw(screen)
+    quit_button.draw(screen)
+    back_button.draw(screen)
 
     target_width = SCREEN_WIDTH
     target_height = int(original_height * (target_width / original_width))
@@ -210,53 +243,24 @@ def instructions1_(SCREEN_WIDTH, SCREEN_HEIGHT):
                 pygame.quit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if 750 <= mouse[0] <= 830 and 600 <= mouse[1] <= 680:
-                    instructions2_(SCREEN_WIDTH, SCREEN_HEIGHT)
-
-        screen.blit(background, (0, 0))
-
-        pygame.draw.rect(screen, DARK_BLUE, [750, 600, 80, 80], border_radius=100)
-
-        pygame.display.update()
-
-
-def instructions2_(SCREEN_WIDTH, SCREEN_HEIGHT):
-    pygame.init()  # Initialize the pygame
-
-    # EXTERNAL WINDOW:
-    # Set up the screen
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-    # GAME SETTINGS:
-    # colors
-    BLACK = (0, 0, 0)
-    LIGHT_BLUE = (65, 163, 187)
-    DARK_BLUE = (27, 148, 153)
-
-    # Background
-    background = pygame.image.load("Images/instructions (2).png")
-    original_width, original_height = background.get_size()
-
-    target_width = SCREEN_WIDTH
-    target_height = int(original_height * (target_width / original_width))
-    # Scale the image with the fixed aspect ratio
-    background = pygame.transform.scale(background, (target_width, target_height))
-
-    # Drawing the screen
-    while True:
-        mouse = pygame.mouse.get_pos()  # Stores in a tuple all the positions of the mouse
-        keys = pygame.key.get_pressed()
-
-        for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
-            if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
-                pygame.quit()
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if 750 <= mouse[0] <= 830 and 600 <= mouse[1] <= 680:
+                if Single_road_button.is_clicked(event.pos):
+                    gameMP(SCREEN_WIDTH, SCREEN_HEIGHT)
+                elif Two_Player_button.is_clicked(event.pos):
+                    gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT)
+                elif credits_button.is_clicked(event.pos):
+                    paused = False  # Resume game
+                elif quit_button.is_clicked(event.pos):
+                    pygame.quit()
+                elif back_button.is_clicked(event.pos):
                     interface()
 
         screen.blit(background, (0, 0))
 
-        pygame.draw.rect(screen, DARK_BLUE, [750, 600, 80, 80], border_radius=100)
+        Single_road_button.draw(screen)
+        Two_Player_button.draw(screen)
+        credits_button.draw(screen)
+        quit_button.draw(screen)
+        back_button.draw(screen)
+
 
         pygame.display.update()

@@ -6,11 +6,14 @@ import pygame
 from car import *
 from coins import Coin
 from messages import *
+from pause import display_pause_menu
 
 
 def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     pygame.init()  # Initialize the pygame
+
+    paused = False
 
     # EXTERNAL WINDOWdd:
     # Set up the screen
@@ -115,6 +118,26 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
         for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
             if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:  # pygame.quit() checks if we pressed the red X (to leave the app)
                 carryOn = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    carryOn = False
+                elif event.key == pygame.K_p:
+                    paused = not paused  # Toggle pause state
+
+        if paused:
+            resume_button, how_to_play_button, credits_button, quit_button = display_pause_menu(screen)
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if resume_button.is_clicked(event.pos):
+                        paused = False  # Resume game
+                    elif how_to_play_button.is_clicked(event.pos):
+                        from instructions import instructions3_
+                        instructions3_(SCREEN_WIDTH, SCREEN_HEIGHT)
+                    elif credits_button.is_clicked(event.pos):
+                        paused = False  # Resume game
+                    elif quit_button.is_clicked(event.pos):
+                        carryOn = False  # Quit game
+            continue  # Skip the rest of the game loop when paused
 
         if movement_enabled1:
             # Move player 1 car (with input from the user):
@@ -358,9 +381,13 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
 
 
 def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
+
     pygame.init()  # Initialize the pygame
 
+    paused = False
+
     # EXTERNAL WINDOW:
+
     # Set up the screen
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Car Racing Game")
@@ -472,6 +499,27 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
             if event.type == pygame.QUIT:  # pygame.quit() checks if we pressed the red X (to leave the app)
                 carryOn = False
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    carryOn = False
+                elif event.key == pygame.K_p:
+                    paused = not paused  # Toggle pause state
+
+        if paused:
+            resume_button, how_to_play_button, credits_button, quit_button = display_pause_menu(screen)
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if resume_button.is_clicked(event.pos):
+                        paused = False  # Resume game
+                    elif how_to_play_button.is_clicked(event.pos):
+                        from instructions import instructions3_
+                        instructions3_(SCREEN_WIDTH, SCREEN_HEIGHT)
+                    elif credits_button.is_clicked(event.pos):
+                        paused = False  # Resume game
+                    elif quit_button.is_clicked(event.pos):
+                        carryOn = False  # Quit game
+            continue  # Skip the rest of the game loop when paused
 
         if movement_enabled1:
             # Move player 1 car (with input from the user):
