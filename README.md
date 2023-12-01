@@ -1,16 +1,24 @@
 <!-- PROJECT SHIELDS -->
+<div align=centre>
 [![Contributors](https://img.shields.io/github/contributors/raquel-amaral18/GroupT_Computation3)](https://github.com/raquel-amaral18/GroupT_Computation3/graphs/contributors)
 [![Issues](https://img.shields.io/github/issues/raquel-amaral18/GroupT_Computation3)](https://github.com/raquel-amaral18/GroupT_Computation3/issues)
 [![MIT License](https://img.shields.io/github/license/raquel-amaral18/GroupT_Computation3)](https://github.com/raquel-amaral18/GroupT_Computation3/blob/main/LICENSE)
+</div>
+
+--- 
 
 <!-- ABOUT THE PROJECT -->
-## Rush Hour: The Race
+# Rush Hour: The Race
 <br />
 <div>
-    <img src="Images/interface.png" alt="Photo" width="80">
+    <img src="Images/interface_readme.png" alt="Photo" width="100">
 
-> Rush Hour: The Race is a fun and easy-to-play 2D car racing game. Your goal is to achieve the longest ride possible without colliding with incoming cars. During your drive, collect coins to increase your score or collide with different power-ups to receive a temporary advantage. Are you ready? Buckle up, step on the gas, and see how far you can go!
+> Rush Hour: The Race is a fun and easy-to-play 2D car racing game. Your goal is to achieve the longest ride possible without colliding with incoming cars. During your drive, collect coins to increase your score or collide with different power-ups to receive a temporary advantage. 
+
+> Are you ready? Buckle up, step on the gas, and see how far you can go!
 </div>
+
+---
 
 <!-- TABLE OF CONTENTS -->
 <details>
