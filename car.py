@@ -17,7 +17,6 @@ class Car(pygame.sprite.Sprite, ABC):
         A class representing a car in the game.
 
         ...
-
         Attributes
         ----------
             image_path : str
@@ -80,7 +79,7 @@ class PlayerCar(Car):
 
         Attributes
         ----------
-            invincible: bool
+            ghost: bool
                 indicates if the player's car is invincible
             visible: bool
                 indicates if the player's car is visible
@@ -98,7 +97,7 @@ class PlayerCar(Car):
             change_speed(self, speed):
                 overrides the base class method to change the speed of the player's car
     """
-    def __init__(self, image_path, width, speed=0):
+    def __init__(self, image_path, width, lives, speed=0):
         """
             Constructs the attributes for the PlayerCar object.
 
@@ -112,9 +111,12 @@ class PlayerCar(Car):
                     the initial speed of the player's car
         """
         super().__init__(image_path, width, speed)
-        self.invincible = False
+        self.ghost = False
         self.visible = True
-        self.speed = 2
+
+        self.lives = lives
+
+        self.speed = 3
 
     # The position of the car is (self.rect.x, self.rect.y)
     def moveRight(self, pixels):
@@ -175,6 +177,8 @@ class IncomingCars(Car):
         self.rect.x = self.initial_x
         self.rect.y = random.randint(-1000, 0)
 
+        self.active_cars_count = 0  # Counter for cars on the screen
+
     def moveDown(self, playerCar_speed):
         # If we change the "player's car speed" the apparent velocity of the incoming
         # cars is their velocity + the velocity of the player
@@ -197,11 +201,11 @@ class IncomingCars(Car):
 
         target_width = 0
         if chosen_type == "motorcycles":
-            target_width = 40
-        elif chosen_type == "cars":
             target_width = 50
-        elif chosen_type == "trucks":
+        elif chosen_type == "cars":
             target_width = 60
+        elif chosen_type == "trucks":
+            target_width = 70
 
         original_image = pygame.image.load(chosen_image_path)
         aspect_ratio = original_image.get_width() / original_image.get_height()
@@ -213,7 +217,7 @@ class IncomingCars(Car):
         self.height = scaled_height
 
         self.rect.x = self.initial_x
-        self.rect.y = random.randint(-2000, 0)
+        self.rect.y = random.randint(-2000, -1000)
         self.change_speed(random.randint(3, 5))
 
 
