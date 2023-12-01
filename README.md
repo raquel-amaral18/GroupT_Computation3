@@ -1,22 +1,22 @@
 <!-- PROJECT SHIELDS -->
+<div style="text-align: center;">
+
 [![Contributors](https://img.shields.io/github/contributors/raquel-amaral18/GroupT_Computation3)](https://github.com/raquel-amaral18/GroupT_Computation3/graphs/contributors)
 [![Issues](https://img.shields.io/github/issues/raquel-amaral18/GroupT_Computation3)](https://github.com/raquel-amaral18/GroupT_Computation3/issues)
-[![MIT License](https://img.shields.io/github/license/raquel-amaral18/GroupT_Computation3)](https://github.com/raquel-amaral18/GroupT_Computation3/blob/main/LICENSE)
+[![MIT License](https://img.shields.io/github/license/raquel-amaral18/GroupT_Computation3)](https://github.com/raquel-amaral18/GroupT_Computation3/blob/main/LICENSE) 
 
---- 
+</div>
+<div style="text-align:center;">
+    <img src="Images/interface_readme.png" alt="Photo" width="600">
+</div>
 
 <!-- ABOUT THE PROJECT -->
 # Rush Hour: The Race
-<br />
-<div>
-    <img src="Images/interface_readme.png" alt="Photo" width="600">
 
-> Rush Hour: The Race is a fun and easy-to-play 2D car racing game. Your goal is to achieve the longest ride possible without colliding with incoming cars. During your drive, collect coins to increase your score or collide with different power-ups to receive a temporary advantage. 
+Rush Hour: The Race is a fun and easy-to-play 2D car racing game. Your goal is to achieve the longest ride possible without colliding with incoming cars. During your drive, collect coins to increase your score or collide with different power-ups to receive a temporary advantage. 
 
-> Are you ready? Buckle up, step on the gas, and see how far you can go!
-</div>
+Are you ready? Buckle up, step on the gas, and see how far you can go!
 
----
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -33,11 +33,13 @@
       </ul>
     </li>
     <li><a href="#How to Play">How to Play</a></li>
+    <li><a href="#Power-Ups">Power-Ups</a></li>
     <li><a href="#Open Issues">Open Issues</a></li>
     <li><a href="#Game Designers">Game Designers</a></li>
     <li><a href="#license">License</a></li>
   </ol>
 </details>
+
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -101,7 +103,6 @@ Please note that these instructions are tailored for Windows users. If you are u
 - Use arrow keys keys to move your car in the desired direction.
 - Other cars will be coming towards you from the opposite direction. To survive, you have to avoid colliding with them.
 - Aside from cars, you might come across **coins** or **power-ups** as well. The more coins you collect, the higher your score will be. Collecting power-ups will grant you a **temporary** advantage.
-- Only **1** power-up can be active at a time, so choose wisely.
 
 #### Multiplayer mode:
 In this mode, players have two exciting options to choose from:
@@ -118,10 +119,81 @@ In this mode, players have two exciting options to choose from:
    - **Player 2:** Use 'WASD' keys for your left highway.
    - Engage in a thrilling race where the goal is to outlast your opponent. In case one of the players crash, the other will be able to continue playing. The main goal will be to **survive longer** than the other player.
    - Two separate highways present different obstacles and opportunities for each player.
-   - Use power-ups strategically, keeping in mind that only one power-up can be active at a time.
    - Each player starts with 3 lives, and the one who survives the longest emerges victorious.
 
   Invite a friend to play with you, and let the race begin! Will you be the ultimate champion of the roads?
+
+
+<!--POWER-UPS -->
+## Power-Ups
+
+Enhance your racing experience with these exciting powerups! Collect them during the game to gain unique advantages.
+
+1. **Invincibility:**
+
+<div style="text-align:center;">
+    <img src="Images/PowerUps/invincibility.png" width="50">
+</div>
+
+- **Effect:** Gain temporary invincibility, protecting your car from collisions.
+- **Duration:** 10 seconds
+
+<br>
+
+2. **Slow Down:**
+
+<div style="text-align:center;">
+    <img src="Images/PowerUps/slow_down.png" width="50">
+</div>
+
+- **Effect:** Force incoming cars to slow down, making it easier to navigate through the traffic.
+- **Duration:** 8 seconds
+
+<br>
+
+3. **Extra Lives:**
+
+<div style="text-align:center;">
+    <img src="Images/PowerUps/heart.png" width="50">
+</div>
+
+- **Effect:** Receive additional lives to extend your gameplay.
+
+<br>
+
+4. **Magnet:**
+
+<div style="text-align:center;">
+    <img src="Images/PowerUps/magnet.png" width="50">
+</div>
+
+- **Effect:** Attract nearby coins to boost your coin count.
+- **Duration:** 15 seconds
+
+<br>
+
+5. **Jet Bomb:**
+
+<div style="text-align:center;">
+    <img src="Images/PowerUps/jet_bomb.png" width="50">
+</div>
+
+- **Effect:** Propel your car forward at high speed, causing explosions with incoming cars when you collide.
+- **Duration:** 5 seconds
+- **Time Warp:** Speed up the game clock by 2 times during the Jet Bomb activation.
+
+<br>
+
+6. **Shrink:**
+
+<div style="text-align:center;">
+    <img src="Images/PowerUps/shrink.png" width="50">
+</div>
+
+- **Effect:** Decrease the size of your car, making it easier to navigate through tight spaces.
+- **Duration:** 8 seconds
+
+> **Note:** You can catch multiple power-ups simultaneously, either of the same type for extended duration or different types for combined effects.
 
 
 <!--OPEN ISSUES -->
@@ -129,7 +201,7 @@ In this mode, players have two exciting options to choose from:
 
 These are areas where improvements or additional features could be considered. While they may not be critical for the fundamental functionality of the game, addressing these items could enhance the overall user experience and contribute to the project's growth:
 
-- [x] Example 1
+- [ ] Code Optimization
 - [x] Example 2
 - [x] Example 3
 - [ ] Example 4
