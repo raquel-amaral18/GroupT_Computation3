@@ -13,7 +13,7 @@
 <!-- ABOUT THE PROJECT -->
 # Rush Hour: The Race
 
-Rush Hour: The Race is a fun and easy-to-play 2D car racing game. Your goal is to achieve the longest ride possible without colliding with incoming cars. During your drive, collect coins to increase your score or collide with different power-ups to receive a temporary advantage. 
+Rush Hour: The Race is an easy-to-play fun car racing game. Your goal is to achieve the longest ride possible without colliding with incoming cars. During your drive, collect coins to increase your score or catch different power-ups to receive a temporary advantage. 
 
 Are you ready? Buckle up, step on the gas, and see how far you can go!
 
@@ -100,7 +100,7 @@ Please note that these instructions are tailored for Windows users. If you are u
 ## How to Play
 
 #### Singleplayer mode:
-- Use arrow keys keys to move your car in the desired direction.
+- Use **arrow keys** to move your car in the desired direction.
 - Other cars will be coming towards you from the opposite direction. To survive, you have to avoid colliding with them.
 - Aside from cars, you might come across **coins** or **power-ups** as well. The more coins you collect, the higher your score will be. Collecting power-ups will grant you a **temporary** advantage.
 
