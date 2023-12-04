@@ -3,7 +3,7 @@ from button import Button
 
 def display_pause_menu(screen):
     """
-    Function to display the pause menu
+    Function to display the pause menu over the game
     """
 
     WHITE = (255, 255, 255)
