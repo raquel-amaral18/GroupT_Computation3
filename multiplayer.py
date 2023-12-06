@@ -825,12 +825,7 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         for car in incoming_cars_list:
             if not playerCar1.ghost and pygame.sprite.collide_mask(playerCar1, car) is not None:
                 if playerCar1.pac_man:
-                    # car stays invisible
-                    car.visible = False
-                    # car gets out of the way
-                    car.speed = car.speed * 10
-                    if car.rect.y >= SCREEN_HEIGHT:
-                        car.visible = True
+                    car.reshape()
 
                 else:
                     # Collision detected
@@ -853,12 +848,7 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         for car in incoming_cars_list:
             if not playerCar2.ghost and pygame.sprite.collide_mask(playerCar2, car) is not None:
                 if playerCar2.pac_man:
-                    # car stays invisible
-                    car.visible = False
-                    # car gets out of the way
-                    car.speed = car.speed * 10
-                    if car.rect.y >= SCREEN_HEIGHT:
-                        car.visible = True
+                    car.reshape()
 
                 else:
                     # Collision detected
