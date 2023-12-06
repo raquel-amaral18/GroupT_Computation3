@@ -810,13 +810,6 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             if car.rect.y >= SCREEN_HEIGHT:
                 car.reshape()
 
-        # Move the opponent cars (automatically):
-        for car in incoming_cars_list:
-            # Velocity
-            car.moveDown(playerCar1.speed)
-            # Reset cars position when they go off-screen
-            if car.rect.y >= SCREEN_HEIGHT:
-                car.reshape()
 
         incoming_powerups_list_left_road.draw(screen)
         incoming_powerups_list_right_road.draw(screen)
