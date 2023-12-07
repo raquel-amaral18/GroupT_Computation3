@@ -146,7 +146,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     power_up_invincibility = Invincibility("Images/PowerUps/invincibility.png", 50, selected_initial_x_pow)
     power_up_slowing = SlowDown("Images/PowerUps/slow_down.png", 50, selected_initial_x_pow)
-    power_up_jetBomb = JetBomb("Images/PowerUps/rocket.png", 50, selected_initial_x_pow)
+    power_up_jet_bomb = JetBomb("Images/PowerUps/jet_bomb.png", 50, selected_initial_x_pow)
     power_up_extra_life = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_x_pow)
     power_up_size_change = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_x_pow)
 
@@ -155,11 +155,11 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     # To show the moving objects on the screen
     all_sprites_list.add(playerCar,
                          car1, car2, car3, car4,
-                         power_up_invincibility, power_up_slowing, power_up_jetBomb, power_up_extra_life,
+                         power_up_invincibility, power_up_slowing, power_up_jet_bomb, power_up_extra_life,
                          power_up_size_change)
     incoming_cars_list.add(car1, car2, car3, car4)
     player_car_list.add(playerCar)
-    incoming_powerups_list.add(power_up_invincibility, power_up_slowing, power_up_jetBomb, power_up_extra_life,
+    incoming_powerups_list.add(power_up_invincibility, power_up_slowing, power_up_jet_bomb, power_up_extra_life,
                                power_up_size_change)
 
     # GAME EXTRAS:
@@ -173,7 +173,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         Ver melhor esta linha
         """
 
-    # PARTICLE:
+    # PARTICLES:
     # Particle Event
     PARTICLE_EVENT = pygame.USEREVENT + 1
     # Time in miliseconds we want to pass between each call of the event
@@ -378,21 +378,22 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
             spawn_prob = random.uniform(0, 100)
 
-            # 5% --> when activated
-            if 0 <= spawn_prob < 5 and playerCar.lives < 3:  # hearts only spawn when player needs them
+            # Hearts --> when activated (hearts only spawn when player needs them)
+            if (0 <= spawn_prob < 20 and playerCar.lives == 1) or (0 <= spawn_prob < 5 and playerCar.lives == 2):
                 power_up_extra_life.active = True
-            # 5%
-            elif 5 <= spawn_prob <= 10:
-                power_up_jetBomb.active = True
-            # 3%
-            elif 10 <= spawn_prob < 15:
-                power_up_slowing.active = True
-            # 6%
-            elif 15 <= spawn_prob < 20:
+            # Size Change
+            elif 20 <= spawn_prob < 35:
                 power_up_size_change.active = True
-            # 0.5%
-            elif 20 <= spawn_prob <= 25:
+            # Slow Down
+            elif 35 <= spawn_prob < 45:
+                power_up_slowing.active = True
+            # Invincibility
+            elif 45 <= spawn_prob <= 50:
                 power_up_invincibility.active = True
+            # Jet Bomb
+            elif 50 <= spawn_prob <= 55:
+                power_up_jet_bomb.active = True
+
 
         # Power up cicle
         for powerup in incoming_powerups_list:

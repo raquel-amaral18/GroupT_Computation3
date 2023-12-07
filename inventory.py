@@ -3,11 +3,27 @@ from button import Button
 import config
 
 
-def show_message(screen, message, position, font_size=30, color=(255, 0, 0)):
-    font = pygame.font.SysFont(None, font_size)
-    text_surface = font.render(message, True, color)
-    text_rect = text_surface.get_rect(center=position)
-    screen.blit(text_surface, text_rect)
+def car_0_select():
+    try:
+        with open('hscore.txt', 'r') as f:
+            high_scores = eval(f.read())
+    except (FileNotFoundError, SyntaxError):
+        high_scores = {}
+
+    if config.username in high_scores:
+        score_coins, inventory_cars, selected_car = high_scores[config.username]
+        score, coins = score_coins
+
+        updated_selected_car = 0
+
+        # Update the dictionary entry
+        high_scores[config.username] = ((score, coins), inventory_cars, updated_selected_car)
+
+        config.chosen_car = 0
+
+        # Write the updated dictionary back to the file
+        with open('hscore.txt', 'w') as f:
+            f.write(repr(high_scores))
 
 
 def car_1_select():
@@ -18,16 +34,15 @@ def car_1_select():
         high_scores = {}
 
     if config.username in high_scores:
-        score_coins, number_tuple, additional_value = high_scores[config.username]
+        score_coins, inventory_cars, selected_car = high_scores[config.username]
         score, coins = score_coins
 
-        # Adding number 2 to the tuple
-        updated_additional_value = 1
+        updated_selected_car = 1
 
         # Update the dictionary entry
-        high_scores[config.username] = ((score, coins), number_tuple, updated_additional_value)
+        high_scores[config.username] = ((score, coins), inventory_cars, updated_selected_car)
 
-        config.chosen_car = 0
+        config.chosen_car = 1
 
         # Write the updated dictionary back to the file
         with open('hscore.txt', 'w') as f:
@@ -42,16 +57,15 @@ def car_2_select():
         high_scores = {}
 
     if config.username in high_scores:
-        score_coins, number_tuple, additional_value = high_scores[config.username]
+        score_coins, inventory_cars, selected_car = high_scores[config.username]
         score, coins = score_coins
 
-        # Adding number 2 to the tuple
-        updated_additional_value = 2
+        updated_selected_car = 2
 
         # Update the dictionary entry
-        high_scores[config.username] = ((score, coins), number_tuple, updated_additional_value)
+        high_scores[config.username] = ((score, coins), inventory_cars, updated_selected_car)
 
-        config.chosen_car = 1
+        config.chosen_car = 2
 
         # Write the updated dictionary back to the file
         with open('hscore.txt', 'w') as f:
@@ -66,16 +80,15 @@ def car_3_select():
         high_scores = {}
 
     if config.username in high_scores:
-        score_coins, number_tuple, additional_value = high_scores[config.username]
+        score_coins, inventory_cars, selected_car = high_scores[config.username]
         score, coins = score_coins
 
-        # Adding number 2 to the tuple
-        updated_additional_value = 3
+        updated_selected_car = 3
 
         # Update the dictionary entry
-        high_scores[config.username] = ((score, coins), number_tuple, updated_additional_value)
+        high_scores[config.username] = ((score, coins), inventory_cars, updated_selected_car)
 
-        config.chosen_car = 2
+        config.chosen_car = 3
 
         # Write the updated dictionary back to the file
         with open('hscore.txt', 'w') as f:
@@ -90,38 +103,13 @@ def car_4_select():
         high_scores = {}
 
     if config.username in high_scores:
-        score_coins, number_tuple, additional_value = high_scores[config.username]
+        score_coins, inventory_cars, selected_car = high_scores[config.username]
         score, coins = score_coins
 
-        # Adding number 2 to the tuple
-        updated_additional_value = 4
+        updated_selected_car = 4
 
         # Update the dictionary entry
-        high_scores[config.username] = ((score, coins), number_tuple, updated_additional_value)
-
-        config.chosen_car = 3
-
-        # Write the updated dictionary back to the file
-        with open('hscore.txt', 'w') as f:
-            f.write(repr(high_scores))
-
-
-def car_5_select():
-    try:
-        with open('hscore.txt', 'r') as f:
-            high_scores = eval(f.read())
-    except (FileNotFoundError, SyntaxError):
-        high_scores = {}
-
-    if config.username in high_scores:
-        score_coins, number_tuple, additional_value = high_scores[config.username]
-        score, coins = score_coins
-
-        # Adding number 2 to the tuple
-        updated_additional_value = 5
-
-        # Update the dictionary entry
-        high_scores[config.username] = ((score, coins), number_tuple, updated_additional_value)
+        high_scores[config.username] = ((score, coins), inventory_cars, updated_selected_car)
 
         config.chosen_car = 4
 
@@ -134,69 +122,69 @@ def inventory(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Initialize Pygame
     pygame.init()
 
-    # Load the existing high scores from the file
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+    # GAME SETTINGS:
+    # colors
+    MAASTRICHT_BLUE = (3, 23, 48)
+    LIGHT_BLUE = (65, 163, 187)
+    RED = (249, 65, 68)
+
+    # Load the existing high scores from hscore.txt
     try:
         with open('hscore.txt', 'r') as f:
             high_scores = eval(f.read())
     except (FileNotFoundError, SyntaxError):
-        high_scores = {}  # Initialize an empty dictionary if file
+        high_scores = {}  # Initialize an empty dictionary if file empty/not working
 
     #CURRENT USER
     # Extract the high score data for the current user
     if config.username in high_scores:
         user_data = high_scores[config.username]
-        user_score, user_coins, cars, user_additional_value = user_data[0][0], user_data[0][1], user_data[1], user_data[2]
+        user_score, user_coins, inventory_cars, user_selected_car = user_data[0][0], user_data[0][1], user_data[1], user_data[2]
     else:
-        user_score = user_coins = user_additional_value = None  # Default values if the user is not found
+        user_score = user_coins = user_selected_car = 0  # Default values if the user is not found
+        inventory_cars = (0,)  # Default value for inventory_cars when user is not found
 
 
-    # Set the screen dimensions (adjust as needed)
-    SCREEN_WIDTH = 900
-    SCREEN_HEIGHT = 700
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    # BACKGROUND:
+    background = pygame.image.load('Images/Design/stars&planets.png')
 
-    # Load background image (replace 'BackgroundStore.png' with your actual image path)
-    background = pygame.image.load('Images/stars&planets.png')
+    # CAR IMAGES:
+    car_width = 100
+    car_images = []
+    distance_between_cars = 70
+    start_x = 50
 
-    # Load car images and scale them (replace 'car_image_x.png' with your actual image paths)
-    car_images = [pygame.transform.scale(pygame.image.load('Images/04C.png'), (50, 70)),
-                  pygame.transform.scale(pygame.image.load('Images/02C.png'), (50, 70)),
-                  pygame.transform.scale(pygame.image.load('Images/05C.png'), (50, 70)),
-                  pygame.transform.scale(pygame.image.load('Images/07C.png'), (50, 70))]
+    for image_path in ['Images/Vehicles/PlayerCar/00C.png', 'Images/Vehicles/PlayerCar/02C.png',
+                       'Images/Vehicles/PlayerCar/04C.png', 'Images/Vehicles/PlayerCar/05C.png',
+                       'Images/Vehicles/PlayerCar/06C.png']:
+        original_image = pygame.image.load(image_path)
+        aspect_ratio = original_image.get_width() / original_image.get_height()
+        scaled_image = pygame.transform.scale(original_image, (car_width, int(car_width / aspect_ratio)))
+        car_images.append(scaled_image)
 
-    car0 = pygame.transform.scale(pygame.image.load('Images/00C.png'), (50, 70))
-
-    # Function to draw the begginer car in the middle of the screen
-    def draw_car0_center():
-        car_width, car_height = 50, 70  # Width and height of the car image
-        center_x = SCREEN_WIDTH // 2 - car_width // 2
-        center_y = SCREEN_HEIGHT // 2 - car_height // 2
-        screen.blit(car0, (center_x, center_y))
-
-    # Function to draw cars on the screen
-    def draw_cars():
-        num_columns = 2
-        num_rows = 2
-        car_width, car_height = 50, 70  # Width and height of the car images
-
-        # Calculate spacing and starting positions
-        column_spacing = SCREEN_WIDTH // num_columns
-        row_spacing = SCREEN_HEIGHT // num_rows
-        start_x = (column_spacing - car_width) // 2
-        start_y = (row_spacing - car_height) // 2
-
-        for i, img in enumerate(car_images):
-            x = start_x + (i % num_columns) * column_spacing
-            y = start_y + (i // num_columns) * row_spacing
-            screen.blit(img, (x, y))
 
     # Create a return button in the top right corner
-    return_button = Button("Return", SCREEN_WIDTH - 110, 10, 100, 50)
-    car0_button = Button("Select", SCREEN_WIDTH // 2 - 22, SCREEN_HEIGHT // 2 + 40, 50, 50, border_radius=0)
-    car1_button = Button("Select", 200, 220, 50, 50, border_radius=0)
-    car2_button = Button("Select", 650, 220, 50, 50, border_radius=0)
-    car3_button = Button("Select", 200, 570, 50, 50, border_radius=0)
-    car4_button = Button("Select", 650, 570, 50, 50, border_radius=0)
+    return_button = Button("X", SCREEN_WIDTH - 100, 100, 50, 50, 50, MAASTRICHT_BLUE, LIGHT_BLUE, border_radius=100)
+
+    # SELECTION BUTTONS:
+    # Map between button index (dynamic) and car selection function
+    car_button_mapping = {
+        0: car_0_select,
+        1: car_1_select,
+        2: car_2_select,
+        3: car_3_select,
+        4: car_4_select,
+    }
+    # Create buttons only for purchased cars, excluding choosen car (0 by default)
+    # Map between button index (dynamic) and car buttons
+    car_buttons_mapping = {
+        i: Button("Select", start_x + i * (car_width + 70), 500, 100, 50, 30, MAASTRICHT_BLUE, LIGHT_BLUE,
+                  border_radius=12)
+        if (i in inventory_cars and i != config.chosen_car) else None
+        for i in range(len(car_images))
+    }
 
     # Main loop for the inventory
     running = True
@@ -210,64 +198,54 @@ def inventory(SCREEN_WIDTH, SCREEN_HEIGHT):
             # Check for mouse button down event
             if event.type == pygame.MOUSEBUTTONDOWN:
                 show_message_flag = False  # Reset message flag
+
                 # Check if the return button is clicked
                 if return_button.is_clicked(event.pos):
                     from interface import interface
                     interface()
-                elif car0_button.is_clicked(event.pos):
-                    if 1 in cars:
-                        from interface import interface
-                        car_1_select()
-                        interface()
-                elif car1_button.is_clicked(event.pos):
-                    if 2 in cars:
-                        from interface import interface
-                        car_2_select()
-                        interface()
-                    else:
-                        message = "Car not purchased"
-                        show_message_flag = True
-                elif car2_button.is_clicked(event.pos):
-                    if 3 in cars:
-                        from interface import interface
-                        car_3_select()
-                        interface()
-                    else:
-                        message = "Car not purchased"
-                        show_message_flag = True
-                elif car3_button.is_clicked(event.pos):
-                    if 4 in cars:
-                        from interface import interface
-                        car_4_select()
-                        interface()
-                    else:
-                        message = "Car not purchased"
-                        show_message_flag = True
-                elif car4_button.is_clicked(event.pos):
-                    if 5 in cars:
-                        from interface import interface
-                        car_5_select()
-                        interface()
-                    else:
-                        message = "Car not purchased"
-                        show_message_flag = True
 
-        # Drawing
-        screen.blit(background, (0, 0))  # Draw background
-        draw_cars()
-        draw_car0_center()  # Draw beginner car in the center
+                # Check if any car button is clicked
+                for i, car_button in car_buttons_mapping.items():
+                    if car_button is not None and car_button.is_clicked(event.pos):
+                        selected_car_number = i
+                        # Call the corresponding car selection function
+                        car_button_mapping[selected_car_number]()
+
+        screen.blit(background, (0, 0))  # Background
+
+        # Clear the existing buttons
+        car_buttons_mapping.clear()
+
+        for i, car_image in enumerate(car_images):
+            x = start_x + i * (car_width + distance_between_cars)
+            y = (screen.get_height() - car_image.get_height()) // 2
+
+            # Check if the car is selectable (purchased or free)
+            if i in inventory_cars:
+                # Draw a rectangle around the selected car (based on config.chosen_car)
+                if config.chosen_car == i:
+                    pygame.draw.rect(screen, LIGHT_BLUE, (x - 10, y - 10, car_width + 20, car_image.get_height() + 20),
+                                     0, border_radius=24)
+                    pygame.draw.rect(screen, MAASTRICHT_BLUE, (x - 8, y - 8, car_width + 16, car_image.get_height() + 16),
+                                     0, border_radius=24)
+                # Draw the cars
+                screen.blit(car_image, (x, y))
+                # Create a new button for the car, excluding the selected car
+                if config.chosen_car != i:
+                    car_buttons_mapping[i] = Button("Select", x, 500, 100, 50, 30, MAASTRICHT_BLUE,
+                                                    LIGHT_BLUE, border_radius=12)
+            else:
+                # Darken the appearance of the car (maintaining shape)
+                darkened_surface = car_image.convert_alpha()
+                darkened_surface.fill((0, 0, 0, 255), None, pygame.BLEND_RGBA_MULT)
+                screen.blit(darkened_surface, (x, y))
 
         # DRAW BUTTONS
         return_button.draw(screen)
-        car0_button.draw(screen)
-        car1_button.draw(screen)
-        car2_button.draw(screen)
-        car3_button.draw(screen)
-        car4_button.draw(screen)
+        for car_button in car_buttons_mapping.values():
+            if car_button is not None:
+                car_button.draw(screen)
 
-        #Purchase Message
-        if show_message_flag:
-            show_message(screen, message, (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
 
         # Update the display
         pygame.display.flip()

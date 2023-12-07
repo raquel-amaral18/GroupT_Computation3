@@ -893,19 +893,19 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             # Hearts --> when activated (hearts only spawn when player needs them)
             if (0 <= spawn_prob < 20 and playerCar1.lives == 1) or (0 <= spawn_prob < 5 and playerCar1.lives == 2):
                 power_up_extra_life_right.active = True
-            # Jet Bomb
-            elif 20 <= spawn_prob <= 80:
-                power_up_jet_bomb_right.active = True
-            # Slow Down
-            elif 80 <= spawn_prob < 85:
-                # if not power_up_slowing.powered_up: #and (pygame.time.get_ticks() - power_up_slowing.cooldown > cooldown_duration):
-                power_up_slowing_right.active = True
             # Size Change
-            elif 85 <= spawn_prob < 90:
+            elif 20 <= spawn_prob < 35:
                 power_up_size_change_right.active = True
+            # Slow Down
+            elif 35 <= spawn_prob < 45:
+                power_up_slowing_right.active = True
             # Invincibility
-            elif 90 <= spawn_prob <= 100:
+            elif 45 <= spawn_prob <= 50:
                 power_up_invincibility_right.active = True
+            # Jet Bomb
+            elif 50 <= spawn_prob <= 55:
+                power_up_jet_bomb_right.active = True
+
 
         # Power up cycle for right road
         for powerup in incoming_powerups_list_right_road:
@@ -1013,19 +1013,18 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             # Hearts --> when activated (hearts only spawn when player needs them)
             if (0 <= spawn_prob < 20 and playerCar2.lives == 1) or (0 <= spawn_prob < 5 and playerCar2.lives == 2):
                 power_up_extra_life.active = True
-            # Jet Bomb
-            elif 20 <= spawn_prob <= 80:
-                power_up_jet_bomb.active = True
-            # Slow Down
-            elif 80 <= spawn_prob < 85:
-                # if not power_up_slowing.powered_up: #and (pygame.time.get_ticks() - power_up_slowing.cooldown > cooldown_duration):
-                power_up_slowing.active = True
             # Size Change
-            elif 85 <= spawn_prob < 90:
+            elif 20 <= spawn_prob < 35:
                 power_up_size_change.active = True
+            # Slow Down
+            elif 35 <= spawn_prob < 45:
+                power_up_slowing.active = True
             # Invincibility
-            elif 90 <= spawn_prob <= 100:
+            elif 45 <= spawn_prob <= 50:
                 power_up_invincibility.active = True
+            # Jet Bomb
+            elif 50 <= spawn_prob <= 55:
+                power_up_jet_bomb.active = True
 
         # Power up cycle for Left road
         for powerup in incoming_powerups_list_left_road:

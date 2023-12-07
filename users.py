@@ -88,8 +88,8 @@ def chosen_car(name):
 
     # Check if the user exists in the high scores
     if name in high_scores:
-        # Extract the existing additional value at index 2
-        existing_additional_value = high_scores[name][2]
-        return existing_additional_value
+        # Extract the selected car value at index 2
+        existing_selected_car = high_scores[name][2]
+        return existing_selected_car
     else:
         return None  # Return None if the user is not found
