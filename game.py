@@ -157,8 +157,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     while carryOn:
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
-            if event.type == pygame.QUIT or keys[
-                pygame.K_ESCAPE]:  # pygame.quit() checks if we pressed the red X (to leave the app)
+            if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:  # pygame.quit() checks if we pressed the red X (to leave the app)
                 carryOn = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pause_button.is_clicked(event.pos):
@@ -176,6 +175,9 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         if paused:
             resume_button, how_to_play_button, credits_button, quit_button = display_pause_menu(screen)
             for event in pygame.event.get():
+                if event.type == pygame.QUIT or keys[
+                    pygame.K_ESCAPE]:  # pygame.quit() checks if we pressed the red X (to leave the app)
+                    carryOn = False
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if resume_button.is_clicked(event.pos):
                         paused = False  # Resume game
@@ -313,7 +315,8 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
             pygame.time.delay(2000)
 
             # The game is over, set the flag and exit the game loop
-            carryOn = False
+            from interface import interface
+            interface()
 
         # Update invincibility status based on elapsed time
         if playerCar.ghost and not playerCar.invincible:

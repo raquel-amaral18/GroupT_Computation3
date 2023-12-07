@@ -80,6 +80,7 @@ def interface():
                     player_name = prompt_player_name()
                     username = user(player_name)
                     config.username = username
+                    config.chosen_car = 0
 
 
 

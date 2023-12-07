@@ -3,7 +3,11 @@ from button import Button
 import config
 
 
-# NO MONEY MESSAGE
+def show_message(screen, message, position, font_size=30, color=(255, 0, 0)):
+    font = pygame.font.SysFont(None, font_size)
+    text_surface = font.render(message, True, color)
+    text_rect = text_surface.get_rect(center=position)
+    screen.blit(text_surface, text_rect)
 
 def car_2_purchase():
     try:
@@ -121,6 +125,11 @@ def store(SCREEN_WIDTH, SCREEN_HEIGHT):
     else:
         user_score = user_coins = user_additional_value = None  # Default values if the user is not found
 
+    # Function to display the user's coin count
+    def display_coins(screen, coins, position, font_size=30, color=(255, 255, 255)):
+        font = pygame.font.SysFont(None, font_size)
+        text_surface = font.render(f"Coins: {coins}", True, color)
+        screen.blit(text_surface, position)
     # Set the screen dimensions (adjust as needed)
     SCREEN_WIDTH = 900
     SCREEN_HEIGHT = 700
@@ -161,6 +170,8 @@ def store(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     # Main loop for the store
     running = True
+    show_message_flag = False
+    message = ""
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -168,6 +179,7 @@ def store(SCREEN_WIDTH, SCREEN_HEIGHT):
 
             # Check for mouse button down event
             if event.type == pygame.MOUSEBUTTONDOWN:
+                show_message_flag = False  # Reset message flag
                 # Check if the return button is clicked
                 if return_button.is_clicked(event.pos):
                     from interface import interface
@@ -178,28 +190,33 @@ def store(SCREEN_WIDTH, SCREEN_HEIGHT):
                         car_2_purchase()
                         interface()
                     else:
-                        print('you already own that car')
+                        message = "You need more coins"
+                        show_message_flag = True
                 elif car2_button.is_clicked(event.pos):
-                    if user_coins >= 5 and (3 not in cars):
+                    if user_coins >= 10 and (3 not in cars):
                         from interface import interface
                         car_3_purchase()
                         interface()
                     else:
-                        print('you already own that car')
+                        message = "You need more coins"
+                        show_message_flag = True
                 elif car3_button.is_clicked(event.pos):
-                    if user_coins >= 5 and (4 not in cars):
+                    if user_coins >= 15 and (4 not in cars):
                         from interface import interface
                         car_4_purchase()
                         interface()
                     else:
-                        print('you already own that car')
+                        message = "You need more coins"
+                        show_message_flag = True
                 elif car4_button.is_clicked(event.pos):
-                    if user_coins >= 5 and (5 not in cars):
+                    if user_coins >= 20 and (5 not in cars):
                         from interface import interface
                         car_5_purchase()
                         interface()
                     else:
-                        print('you already own that car')
+                        message = "You need more coins"
+                        show_message_flag = True
+
         # Drawing
         screen.blit(background, (0, 0))  # Draw background
         draw_cars()
@@ -208,6 +225,14 @@ def store(SCREEN_WIDTH, SCREEN_HEIGHT):
         car2_button.draw(screen)  # Draw the return button
         car3_button.draw(screen)  # Draw the return button
         car4_button.draw(screen)  # Draw the return button
+
+
+        # Display coin count
+        display_coins(screen, user_coins, (10, 10))
+
+        #You Need more Coins message
+        if show_message_flag:
+            show_message(screen, message, (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
 
         # Update the display
         pygame.display.flip()
