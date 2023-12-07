@@ -1,12 +1,17 @@
 import random
 import pygame
 
+import config
+
 from car import PlayerCar, IncomingCars
+from powerups import Invincibility, SlowDown, RestoreLives, JetBomb, SizeChange
+
+from pause import display_pause_menu
+from button import Button
+
+from particles import *
 from coins import Coin
 from messages import show_message
-from pause import display_pause_menu
-from powerups import Invincibility, SlowDown, RestoreLives, JetBomb, SizeChange
-from button import Button
 
 
 def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
@@ -458,7 +463,6 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
 
 
 def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
-
     pygame.init()  # Initialize the pygame
 
     paused = False
@@ -474,13 +478,13 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     WHITE = (255, 255, 255)
     RED = (249, 65, 68)
     BLUE = (0, 180, 216)
-    ORANGE = (255, 159, 28)
+    BLACK = (0, 0, 0)
 
     # Font
     timer_font = pygame.font.SysFont('monospace', 20, bold=True)
     message_font = pygame.font.SysFont('monospace', 30, bold=True)
     level_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 150)
-    coins_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30)
+    game_over = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 50)
 
     messages_group = pygame.sprite.Group()
 
@@ -488,10 +492,10 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Pause button
     pause_img = pygame.image.load("Images/Extras/pause.png").convert()
     pause_img = pygame.transform.scale(pause_img, (20, 20))
-    pause_button = Button("", 380, 5, 20, 20, font_size=0, text_color=0, button_color=(0, 0, 0, 255))
+    pause_button = Button("", 15, 5, 20, 20, font_size=0, text_color=0, button_color=(0, 0, 0, 255), border_radius=0)
 
     # Lives
-    heart_img = pygame.image.load("Images/heart.png").convert()
+    heart_img = pygame.image.load("Images/Extras/heart.png").convert()
     heart_img = pygame.transform.scale(heart_img, (20, 20))
 
     # ENVIRONMENTS:
@@ -503,6 +507,8 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     num_lanes = 4  # Number of lanes
     road_width = 400  # Width of the road
     lane_width = road_width / num_lanes
+    road_speed1 = 10
+    road_speed2 = 10
 
     # ROAD Player 1 (Right Side):
     # Center of the right half of the screen
@@ -515,7 +521,6 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     left_road_center = SCREEN_WIDTH / 4
     # Positioning the road in the middle of the left half
     road_x_left = left_road_center - (road_width / 2)
-
 
     # VEHICLES:
     # Player 1 car
@@ -531,21 +536,23 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Opponent cars
     car1 = IncomingCars("Images/Vehicles/IncomingCars/03C.png", 60, 2, road_x_left + (lane_width - 50) // 2)
     car2 = IncomingCars("Images/Vehicles/IncomingCars/02C.png", 60, 4, road_x_left + lane_width + (lane_width - 50) // 2)
-    car3 = IncomingCars("Images/Vehicles/IncomingCars/07C.png", 60, 3, road_x_left + (2 * lane_width) + (lane_width - 50) // 2)
-    car4 = IncomingCars("Images/Vehicles/IncomingCars/08C.png", 60, 1, road_x_left + (3 * lane_width) + (lane_width - 50) // 2)
+    car3 = IncomingCars("Images/Vehicles/IncomingCars/05C.png", 60, 3, road_x_left + (2 * lane_width) + (lane_width - 50) // 2)
+    car4 = IncomingCars("Images/Vehicles/IncomingCars/07C.png", 60, 1, road_x_left + (3 * lane_width) + (lane_width - 50) // 2)
 
     car5 = IncomingCars("Images/Vehicles/IncomingCars/03C.png", 60, 2, road_x_right + (lane_width - 50) // 2)
     car6 = IncomingCars("Images/Vehicles/IncomingCars/02C.png", 60, 4, road_x_right + lane_width + (lane_width - 50) // 2)
-    car7 = IncomingCars("Images/Vehicles/IncomingCars/07C.png", 60, 3, road_x_right + (2 * lane_width) + (lane_width - 50) // 2)
-    car8 = IncomingCars("Images/Vehicles/IncomingCars/08C.png", 60, 1, road_x_right + (3 * lane_width) + (lane_width - 50) // 2)
-
+    car7 = IncomingCars("Images/Vehicles/IncomingCars/05C.png", 60, 3, road_x_right + (2 * lane_width) + (lane_width - 50) // 2)
+    car8 = IncomingCars("Images/Vehicles/IncomingCars/07C.png", 60, 1, road_x_right + (3 * lane_width) + (lane_width - 50) // 2)
 
     all_sprites_list = pygame.sprite.Group()
-    incoming_cars_list = pygame.sprite.Group()
+    incoming_cars_list_right = pygame.sprite.Group()
+    incoming_cars_list_left = pygame.sprite.Group()
     player_car_list1 = pygame.sprite.Group()
     player_car_list2 = pygame.sprite.Group()
+    explosion_group = pygame.sprite.Group()
 
     # POWER UPS:
+    # Left Road
     initial_left_x_pow = [
         (road_x_left + (lane_width - 40) // 2),  # lane 1
         (road_x_left + lane_width + (lane_width - 40) // 2),  # lane 2
@@ -553,6 +560,17 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         (road_x_left + (3 * lane_width) + (lane_width - 40) // 2)  # lane 4
     ]
 
+    selected_initial_left_x_pow = random.choice(initial_left_x_pow)
+
+    power_up_invincibility = Invincibility("Images/PowerUps/invincibility.png", 50, selected_initial_left_x_pow)
+    power_up_slowing = SlowDown("Images/PowerUps/slow_down.png", 50, selected_initial_left_x_pow)
+    power_up_jet_bomb = JetBomb("Images/PowerUps/jet_bomb.png", 50, selected_initial_left_x_pow)
+    power_up_extra_life = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_left_x_pow)
+    power_up_size_change = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_left_x_pow)
+
+    incoming_powerups_list_left_road = pygame.sprite.Group()
+
+    # Right Road
     initial_right_x_pow = [
         (road_x_right + (lane_width - 50) // 2),  # lane 1
         (road_x_right + lane_width + (lane_width - 50) // 2),  # lane 2
@@ -560,27 +578,26 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         (road_x_right + (3 * lane_width) + (lane_width - 50) // 2)  # lane 4
     ]
 
-    selected_initial_left_x_pow = random.choice(initial_left_x_pow)
     selected_initial_right_x_pow = random.choice(initial_right_x_pow)
 
-    power_up_invincibility = Invincibility("Images/PowerUps/invincibility.png", 50, selected_initial_left_x_pow)
-    power_up_slowing = SlowDown("Images/PowerUps/slow_down.png", 50, selected_initial_left_x_pow)
-    power_up_jet_bomb = JetBomb("Images/PowerUps/rocket.png", 50, selected_initial_left_x_pow)
-    power_up_extra_life = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_left_x_pow)
-    power_up_size_change = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_left_x_pow)
+    power_up_invincibility_right = Invincibility("Images/PowerUps/invincibility.png", 50, selected_initial_right_x_pow)
+    power_up_slowing_right = SlowDown("Images/PowerUps/slow_down.png", 50, selected_initial_right_x_pow)
+    power_up_jet_bomb_right = JetBomb("Images/PowerUps/jet_bomb.png", 50, selected_initial_right_x_pow)
+    power_up_extra_life_right = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_right_x_pow)
+    power_up_size_change_right = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_right_x_pow)
 
-    power_up_invincibilityr = Invincibility("Images/PowerUps/invincibility.png", 50, selected_initial_right_x_pow)
-    power_up_slowingr = SlowDown("Images/PowerUps/slow_down.png", 50, selected_initial_right_x_pow)
-    power_up_jet_bombr = JetBomb("Images/PowerUps/rocket.png", 50, selected_initial_right_x_pow)
-    power_up_extra_lifer = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_right_x_pow)
-    power_up_size_changer = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_right_x_pow)
+    incoming_powerups_list_right_road = pygame.sprite.Group()
 
-    incoming_powerups_list = pygame.sprite.Group()
-
-    all_sprites_list.add(playerCar1,playerCar2, car1, car2, car3, car4, car5, car6, car7, car8, power_up_invincibility, power_up_slowing, power_up_jet_bomb,
+    # Add Objects to Lists
+    all_sprites_list.add(playerCar1, playerCar2, car1, car2, car3, car4, car5, car6, car7, car8, power_up_invincibility,
+                         power_up_slowing, power_up_jet_bomb,
                          power_up_extra_life, power_up_size_change)  # To show the moving objects on the screen
-    incoming_cars_list.add(car1, car2, car3, car4, car5, car6, car7, car8)
-    incoming_powerups_list.add(power_up_invincibility, power_up_slowing, power_up_jet_bomb, power_up_extra_life, power_up_size_change, power_up_invincibilityr, power_up_slowingr, power_up_jet_bombr, power_up_extra_lifer, power_up_size_changer)
+    incoming_cars_list_left.add(car1, car2, car3, car4)
+    incoming_cars_list_right.add(car5, car6, car7, car8)
+    incoming_powerups_list_left_road.add(power_up_invincibility, power_up_slowing, power_up_jet_bomb,
+                                         power_up_extra_life, power_up_size_change)
+    incoming_powerups_list_right_road.add(power_up_invincibility_right, power_up_slowing_right, power_up_jet_bomb_right,
+                                          power_up_extra_life_right, power_up_size_change_right)
     player_car_list1.add(playerCar1)
     player_car_list2.add(playerCar2)
 
@@ -590,12 +607,37 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     powerup_bar_Y = 50
     powerup_bar_width = 162
 
+    # PARTICLES:
+    # Particle Event
+    PARTICLE_EVENT = pygame.USEREVENT + 1
+    # Time in miliseconds we want to pass between each call of the event
+    pygame.time.set_timer(PARTICLE_EVENT, 5)
+
+    particle1 = Particle(pygame.Color('red'))
+    particle2 = Particle(pygame.Color('orange'))
+    particle3 = Particle(pygame.Color('yellow'))
+
+    particle4 = Particle(pygame.Color('red'))
+    particle5 = Particle(pygame.Color('orange'))
+    particle6 = Particle(pygame.Color('yellow'))
+
     carryOn = True
 
-    # Controls whether the player 1 input should or not be considered
+    # Controls whether the player's input should or not be considered
     movement_enabled1 = True
-    # Controls whether the player 2 input should or not be considered
     movement_enabled2 = True
+
+    # Variable to track the active power-up
+    active_powerup = None
+
+    # GAME OVER:
+    # Controls whether player's game is on
+    player1_game_over = False
+    player2_game_over = False
+
+    # Controls wheter there is incoming cars
+    spawn_cars_right = True
+    spawn_cars_left = True
 
     # Game level
     level = 1
@@ -620,6 +662,20 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                 if pause_button.is_clicked(event.pos):
                     paused = not paused  # Resume game
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if pause_button.is_clicked(event.pos):
+                    paused = not paused  # Resume game
+
+            # activate particle event
+            if event.type == PARTICLE_EVENT:
+                particle1.add_particles(playerCar1.rect.x, playerCar1.rect.y)
+                particle2.add_particles(playerCar1.rect.x, playerCar1.rect.y)
+                particle3.add_particles(playerCar1.rect.x, playerCar1.rect.y)
+
+                particle4.add_particles(playerCar2.rect.x, playerCar2.rect.y)
+                particle5.add_particles(playerCar2.rect.x, playerCar2.rect.y)
+                particle6.add_particles(playerCar2.rect.x, playerCar2.rect.y)
+
         if paused:
             resume_button, how_to_play_button, credits_button, quit_button = display_pause_menu(screen)
             for event in pygame.event.get():
@@ -627,8 +683,7 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     if resume_button.is_clicked(event.pos):
                         paused = False  # Resume game
                     elif how_to_play_button.is_clicked(event.pos):
-                        from instructions import instructions3_
-                        instructions3_(SCREEN_WIDTH, SCREEN_HEIGHT)
+                        pass
                     elif credits_button.is_clicked(event.pos):
                         paused = False  # Resume game
                     elif quit_button.is_clicked(event.pos):
@@ -677,157 +732,183 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         pygame.draw.rect(screen, GREY, [road_x_left, 0, road_width, SCREEN_HEIGHT])  # Left Road
         pygame.draw.rect(screen, GREY, [road_x_right, 0, road_width, SCREEN_HEIGHT])  # Right Road
 
-        # DRAW ROAD MARKINGS FOR THE LEFT ROAD
-        middle_line_x_left = road_x_left + road_width / 2
-        pygame.draw.line(screen, WHITE, [middle_line_x_left, 0], [middle_line_x_left, SCREEN_HEIGHT], 6)
-
-        dashed_lines_x_left = [road_x_left + (i * lane_width) for i in range(1, num_lanes)]
-
-        offset_y = (pygame.time.get_ticks() // 10) % 40
-        for line_x in dashed_lines_x_left:
-            for line_y in range(0, SCREEN_HEIGHT, 40):
-                pygame.draw.line(screen, WHITE, [line_x, line_y + offset_y], [line_x, line_y + 20 + offset_y], 1)
-
         # DRAW ROAD MARKINGS FOR THE RIGHT ROAD
         middle_line_x_right = road_x_right + road_width / 2
         pygame.draw.line(screen, WHITE, [middle_line_x_right, 0], [middle_line_x_right, SCREEN_HEIGHT], 6)
 
         dashed_lines_x_right = [road_x_right + (i * lane_width) for i in range(1, num_lanes)]
 
-        offset_y = (pygame.time.get_ticks() // 10) % 40
+        offset_y = (pygame.time.get_ticks() // road_speed1) % 40
         for line_x in dashed_lines_x_right:
             for line_y in range(0, SCREEN_HEIGHT, 40):
                 pygame.draw.line(screen, WHITE, [line_x, line_y + offset_y], [line_x, line_y + 20 + offset_y], 1)
 
-        # Draw the cars
-        incoming_cars_list.draw(screen)
-        for player in player_car_list:
-            if player.visible:
-                player_car_list.draw(screen)
+        # DRAW ROAD MARKINGS FOR THE LEFT ROAD
+        middle_line_x_left = road_x_left + road_width / 2
+        pygame.draw.line(screen, WHITE, [middle_line_x_left, 0], [middle_line_x_left, SCREEN_HEIGHT], 6)
+
+        dashed_lines_x_left = [road_x_left + (i * lane_width) for i in range(1, num_lanes)]
+
+        offset_y = (pygame.time.get_ticks() // road_speed2) % 40
+        for line_x in dashed_lines_x_left:
+            for line_y in range(0, SCREEN_HEIGHT, 40):
+                pygame.draw.line(screen, WHITE, [line_x, line_y + offset_y], [line_x, line_y + 20 + offset_y], 1)
+
+        # Draw player's cars
+        if playerCar1.visible:
+            player_car_list1.draw(screen)
+        if playerCar2.visible:
+            player_car_list2.draw(screen)
+
+        # Draw Power ups
+        incoming_powerups_list_left_road.draw(screen)
+        incoming_powerups_list_right_road.draw(screen)
 
         # Move the opponent cars (automatically):
-        for car in incoming_cars_list:
+        for car in incoming_cars_list_right:
             # Velocity
             car.moveDown(playerCar1.speed)
             # When the cars go out of the screen, we move them up again
             if car.rect.y >= SCREEN_HEIGHT:
                 car.reshape()
+            incoming_cars_list_right.draw(screen)
 
         # Move the opponent cars (automatically):
-        for car in incoming_cars_list:
+        for car in incoming_cars_list_left:
             # Velocity
-            car.moveDown(playerCar1.speed)
-            # Reset cars position when they go off-screen
+            car.moveDown(playerCar2.speed)
+            # When the cars go out of the screen, we move them up again
             if car.rect.y >= SCREEN_HEIGHT:
                 car.reshape()
+            incoming_cars_list_left.draw(screen)
 
-        incoming_powerups_list.draw(screen)
+        # Draw the explosion
+        explosion_group.update()
+        explosion_group.draw(screen)
 
         # Handle collisions with PlayerCar1
-        for car in incoming_cars_list:
+        for car in incoming_cars_list_right:
             if not playerCar1.ghost and pygame.sprite.collide_mask(playerCar1, car) is not None:
-                if playerCar1.pac_man:
-                    # car stays invisible
-                    car.visible = False
-                    # car gets out of the way
-                    car.speed = car.speed * 10
-                    if car.rect.y >= SCREEN_HEIGHT:
-                        car.visible = True
+                if playerCar1.jet_bomb:
+                    # saves incoming car posiion before it being reshaped
+                    car_current_x = car.rect.x
+                    car_current_y = car.rect.y + car.height / 2  # makes the explosion closer to the playerCar
+                    # incoming car "vanishes"
+                    car.reshape()
+                    # explosion animation created and added to the sprite list
+                    explosion = Explosion(car_current_x, car_current_y)
+                    explosion_group.add(explosion)
 
-                else:
+                if not playerCar1.invincible and not playerCar1.jet_bomb:
                     # Collision detected
                     playerCar1.lives -= 1
                     show_message(messages_group, "-1", message_font, (playerCar1.rect.x, playerCar1.rect.y), RED)
                     # Activate invincibility for 5 seconds after collision
                     playerCar1.ghost = True
+                    print(playerCar2)
                     # playerCar.invincible is a check to not enter playerCar.ghost timer when we activate invincibility powerup
                     playerCar1.invincible = False
-                    ghost_start_time = pygame.time.get_ticks()
+                    ghost_start_time_1 = pygame.time.get_ticks()
                     ghost_duration = 2000
                     # Reset player's car position
-                    playerCar1.rect.x = right_road_center - (playerCar1.rect.width // 2)
+                    playerCar1.rect.x = right_road_center - 25
                     playerCar1.rect.y = SCREEN_HEIGHT - 150
                     # If no lives left --> end the game
                     if playerCar1.lives == 0:
-                        carryOn = True
+                        player1_game_over = True
 
-            # Handle collisions with PlayerCar2
-            for car in incoming_cars_list:
-                if not playerCar2.ghost and pygame.sprite.collide_mask(playerCar2, car) is not None:
-                    if playerCar2.pac_man:
-                        # car stays invisible
-                        car.visible = False
-                        # car gets out of the way
-                        car.speed = car.speed * 10
-                        if car.rect.y >= SCREEN_HEIGHT:
-                            car.visible = True
+        # Handle collisions with PlayerCar2
+        for car in incoming_cars_list_left:
+            if not playerCar2.ghost and pygame.sprite.collide_mask(playerCar2, car) is not None:
+                if playerCar2.jet_bomb:
+                    # saves incoming car posiion before it being reshaped
+                    car_current_x = car.rect.x
+                    car_current_y = car.rect.y + car.height / 2  # makes the explosion closer to the playerCar
+                    # incoming car "vanishes"
+                    car.reshape()
+                    # explosion animation created and added to the sprite list
+                    explosion = Explosion(car_current_x, car_current_y)
+                    explosion_group.add(explosion)
 
-                    else:
-                        # Collision detected
-                        playerCar2.lives -= 1
-                        show_message(messages_group, "-1", message_font, (playerCar2.rect.x, playerCar2.rect.y), RED)
-                        # Activate invincibility for 5 seconds after collision
-                        playerCar2.ghost = True
-                        # playerCar.invincible is a check to not enter playerCar.ghost timer when we activate invincibility powerup
-                        playerCar2.invincible = False
-                        ghost_start_time = pygame.time.get_ticks()
-                        ghost_duration = 2000
-                        # Reset player's car position
-                        playerCar2.rect.x = left_road_center - (playerCar2.rect.width // 2)
-                        playerCar2.rect.y = SCREEN_HEIGHT - 150
-                        # If no lives left --> end the game
-                        if playerCar2.lives == 0:
-                            carryOn = True
+                if not playerCar2.invincible and not playerCar2.jet_bomb:
+                    # Collision detected
+                    playerCar2.lives -= 1
+                    show_message(messages_group, "-1", message_font, (playerCar2.rect.x, playerCar2.rect.y), RED)
+                    # Activate invincibility for 5 seconds after collision
+                    playerCar2.ghost = True
+                    # playerCar.invincible is a check to not enter playerCar.ghost timer when we activate invincibility powerup
+                    playerCar2.invincible = False
+                    ghost_start_time_2 = pygame.time.get_ticks()
+                    ghost_duration = 2000
+                    # Reset player's car position
+                    playerCar2.rect.x = left_road_center - 25
+                    playerCar2.rect.y = SCREEN_HEIGHT - 150
+                    # If no lives left --> end the game
+                    if playerCar2.lives == 0:
+                        player2_game_over = True
 
-            # Update invincibility status based on elapsed time
-            # Player car 1
-            if playerCar1.ghost and not playerCar1.invincible:
-                elapsed_time = pygame.time.get_ticks() - ghost_start_time
-                toggle_interval = 200
-                if elapsed_time >= ghost_duration:
-                    playerCar1.ghost = False
-                    playerCar1.visible = True
-                    movement_enabled = True
-                else:
-                    playerCar1.visible = (elapsed_time // toggle_interval) % 2 == 0
+        # Update invincibility status based on elapsed time
+        # Player car 1
+        if playerCar1.ghost:
+            elapsed_time = pygame.time.get_ticks() - ghost_start_time_1
+            toggle_interval = 200
+            if elapsed_time >= ghost_duration:
+                playerCar1.ghost = False
+                playerCar1.visible = True
+            else:
+                playerCar1.visible = (elapsed_time // toggle_interval) % 2 == 0
 
-            # Player car 2
-            if playerCar2.ghost and not playerCar2.invincible:
-                elapsed_time = pygame.time.get_ticks() - ghost_start_time
-                toggle_interval = 200
-                if elapsed_time >= ghost_duration:
-                    playerCar2.ghost = False
-                    playerCar2.visible = True
-                    movement_enabled = True
-                else:
-                    playerCar2.visible = (elapsed_time // toggle_interval) % 2 == 0
+        # Player car 2
+        if playerCar2.ghost:
+            elapsed_time = pygame.time.get_ticks() - ghost_start_time_2
+            toggle_interval = 200
+            if elapsed_time >= ghost_duration:
+                playerCar2.ghost = False
+                playerCar2.visible = True
+            else:
+                playerCar2.visible = (elapsed_time // toggle_interval) % 2 == 0
 
-        # Power up picker --> probability:
-        if all(not powerup.active for powerup in incoming_powerups_list):
+        all_sprites_list.update()
 
-            spawn_prob = random.randint(0, 100)
+        # Check if both players have lost all lives
+        if player1_game_over and player2_game_over:
+            carryOn = False
+        elif player1_game_over:
+            playerCar1.visible = False
+            spawn_cars_right = False
+            text = game_over.render("Player 1 Game Over", True, RED)
+            screen.blit(text, (road_x_right, SCREEN_HEIGHT // 2 - text.get_height() // 2))
+        elif player2_game_over:
+            playerCar2.visible = False
+            spawn_cars_left = False
+            text = game_over.render("Player 2 Game Over", True, RED)
+            screen.blit(text, (road_x_left, SCREEN_HEIGHT // 2 - text.get_height() // 2))
 
-            # hearts only spawn when player needs them
-            # 30% --> when activated
-            if 0 <= spawn_prob < 20 and playerCar1.lives < 3:
-                power_up_extra_life.active = True
-            # 30%
+
+        # Power up picker --> probability for Right Road:
+        if all(not powerup.active for powerup in incoming_powerups_list_right_road):
+
+            spawn_prob = random.uniform(0, 100)
+
+            # Hearts --> when activated (hearts only spawn when player needs them)
+            if (0 <= spawn_prob < 20 and playerCar1.lives == 2) or (0 <= spawn_prob < 5 and playerCar1.lives == 2):
+                power_up_extra_life_right.active = True
+            # Jet Bomb
             elif 20 <= spawn_prob <= 80:
-                power_up_jet_bomb.active = True
-            # 15%
+                power_up_jet_bomb_right.active = True
+            # Slow Down
             elif 80 <= spawn_prob < 85:
                 # if not power_up_slowing.powered_up: #and (pygame.time.get_ticks() - power_up_slowing.cooldown > cooldown_duration):
-                power_up_slowing.active = True
-            # 15%
+                power_up_slowing_right.active = True
+            # Size Change
             elif 85 <= spawn_prob < 90:
-                power_up_size_change.active = True
-            # 10%
+                power_up_size_change_right.active = True
+            # Invincibility
             elif 90 <= spawn_prob <= 100:
-                power_up_invincibility.active = True
+                power_up_invincibility_right.active = True
 
-        # Power up cicle
-        for powerup in incoming_powerups_list:
-
+        # Power up cycle for right road
+        for powerup in incoming_powerups_list_right_road:
             # POWERUP contact with playerCar + respawn
             if powerup.active:
                 powerup.moveDown(powerup.speed)
@@ -839,29 +920,16 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     if powerup.powered_up:
                         powerup.active_time = pygame.time.get_ticks()
                         powerup.affect_player(playerCar1, screen, messages_group)
-                        powerup.affect_traffic(incoming_cars_list)
-                        powerup.reshape(road_x_left, lane_width)
-
-                if powerup.active:
-                    powerup.moveDown(powerup.speed)
-
-                    if pygame.sprite.collide_mask(playerCar2, powerup) is not None:
-
-                        powerup.powered_up = True
-
-                        if powerup.powered_up:
-                            powerup.active_time = pygame.time.get_ticks()
-                            powerup.affect_player(playerCar1, screen, messages_group)
-                            powerup.affect_traffic(incoming_cars_list)
-                            powerup.reshape(road_x_left, lane_width)
+                        powerup.affect_traffic(incoming_cars_list_right, messages_group)
+                        powerup.reshape(road_x_right, lane_width)
 
                 # Powerup isn't caught
                 elif powerup.rect.y >= SCREEN_HEIGHT:
-                    powerup.reshape(road_x_left, lane_width)
+                    powerup.reshape(road_x_right, lane_width)
 
         # Power up Timer --> when powerup ends, effect stops
         current_time = pygame.time.get_ticks()
-        for powerup in incoming_powerups_list:
+        for powerup in incoming_powerups_list_right_road:
             if powerup.powered_up:
                 elapsed_time = current_time - powerup.active_time
                 # Checks if we are still within powerup effect time
@@ -870,38 +938,159 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     remaining_ratio = (powerup.duration - elapsed_time) / powerup.duration
                     # Scale bar width based on remaining time (orange bar decreases)
                     powerup_bar_width = max_powerup_bar_width * remaining_ratio
-                    # Effect to make car blink while invincibility powerup is active
-                    if playerCar1.ghost and playerCar1.invincible:
-                        playerCar1.visible = (elapsed_time // 200) % 2 == 0
                 # Powerup effect time is over
                 else:
-                    powerup.effect_over(playerCar1, incoming_cars_list, screen)
+                    powerup.effect_over(playerCar1, incoming_cars_list_right, screen)
                     powerup.powered_up = False
-                    # self.cooldown = current_time
+
+                # Make visual effect of slowing last 1 milisecond (since power up picked)
+                if elapsed_time < 100:
+                    for car in incoming_cars_list_right:
+                        # Only works if power up slowing is caught
+                        if car.is_speed_reduced:
+                            # Creates a blue mask on top of every incoming car (defined in car.reshape())
+                            screen.blit(car.slowing_mask, (car.rect.x, car.rect.y))
+                # Makes cars return to normal speed before jet_bomb ends, since due to their high speed, playerCar
+                # was almost guaranteed to take a hit from cars that had already spawned before the powerup ended
+                # Cant redefine speed in powerup feature jet_bomb else, since cars start to lose fps.
+                if elapsed_time > powerup.duration - 100:
+                    for car in incoming_cars_list_right:
+                        if playerCar1.jet_bomb:
+                            car.speed = random.randint(1, 4)
 
         # Power up countdown Bar
-        for powerup in incoming_powerups_list:
+        for powerup in incoming_powerups_list_right_road:
             if powerup.powered_up:
                 pygame.draw.rect(screen, WHITE,
                                  [powerup_bar_x - 5, powerup_bar_Y - 5, max_powerup_bar_width + 6, 34])  # border
                 pygame.draw.rect(screen, BLACK,
                                  [powerup_bar_x - 4, powerup_bar_Y - 4, max_powerup_bar_width + 4, 32])  # background
-                pygame.draw.rect(screen, ORANGE, [powerup_bar_x, powerup_bar_Y, powerup_bar_width, 24])  # timer bar
-
-        # Pac_man
-        # for car in incoming_cars_list:
-        # if not playerCar.ghost and pygame.sprite.collide_mask(playerCar, car) is not None:
+                pygame.draw.rect(screen, BLUE, [powerup_bar_x, powerup_bar_Y, powerup_bar_width, 24])  # timer bar
 
         # Power up contact with incoming cars
-        """
-        Quando nível sobe muito , carros vão demasiado rápido...levao os powerups atrás pq velocidade de aceleração do
-        powerup é mais pequena q a do carro...arrnajar maneira de aumentar velocidade dos powerups para ficar proporcional
-        com a dos carros, à medida q o nível sobe. 
+        for powerup in incoming_powerups_list_right_road:
+            for car in incoming_cars_list_right:
+                # Condition to only run this code on the screen player can see
+                # ... otherwise powerup appear to fast in the screen ... and to reduce collisions we can´t see
+                if (0 <= powerup.rect.x <= SCREEN_WIDTH - powerup.rect.width and
+                        -5 <= powerup.rect.y <= SCREEN_HEIGHT - powerup.rect.height and
+                        0 <= car.rect.x <= SCREEN_WIDTH - car.rect.width and
+                        -5 <= car.rect.y <= SCREEN_HEIGHT - car.rect.height):
+                    if pygame.sprite.collide_mask(powerup, car) is not None:
+                        # velocidade aumenta à medida que os níveis sobem
+                        powerup.speed = 10 + (level - 1) * 3
 
-        aumentar velocidadde de impacto com o nivel... if level == 3: powerup.speed = ....
-        """
-        for powerup in incoming_powerups_list:
-            for car in incoming_cars_list:
+        # Invincibility Effect
+        if playerCar1.invincible:
+            screen.blit(playerCar1.mask_surface, (playerCar1.rect.x, playerCar1.rect.y))
+
+        # Jet_bomb features
+        if playerCar1.jet_bomb:
+            # Display playerCar nitro particles
+            particle1.emit(screen)
+            particle2.emit(screen)
+            particle3.emit(screen)
+            # Car goes "pilot-mode"
+            movement_enabled1 = False
+            playerCar1.moveUp(1)
+            # Doesn't let the car speed up to the top of the screen
+            if playerCar1.rect.y < 150:
+                playerCar1.moveDown(1)
+            # Increase incoming car speed (high speed effect)
+            for car in incoming_cars_list_right:
+                car.speed += 0.5
+            # Increase road velocity (high speed effect)
+            road_speed1 = 2
+        else:
+            movement_enabled1 = True
+            road_speed1 = 10
+
+        # Power up picker --> probability for Left Road:
+        if all(not powerup.active for powerup in incoming_powerups_list_left_road):
+
+            spawn_prob = random.uniform(0, 100)
+
+            # Hearts --> when activated (hearts only spawn when player needs them)
+            if (0 <= spawn_prob < 20 and playerCar2.lives == 2) or (0 <= spawn_prob < 5 and playerCar2.lives == 2):
+                power_up_extra_life.active = True
+            # Jet Bomb
+            elif 20 <= spawn_prob <= 80:
+                power_up_jet_bomb.active = True
+            # Slow Down
+            elif 80 <= spawn_prob < 85:
+                # if not power_up_slowing.powered_up: #and (pygame.time.get_ticks() - power_up_slowing.cooldown > cooldown_duration):
+                power_up_slowing.active = True
+            # Size Change
+            elif 85 <= spawn_prob < 90:
+                power_up_size_change.active = True
+            # Invincibility
+            elif 90 <= spawn_prob <= 100:
+                power_up_invincibility.active = True
+
+        # Power up cycle for Left road
+        for powerup in incoming_powerups_list_left_road:
+
+            # POWERUP contact with playerCar + respawn
+            if powerup.active:
+                powerup.moveDown(powerup.speed)
+
+                if pygame.sprite.collide_mask(playerCar2, powerup) is not None:
+
+                    powerup.powered_up = True
+
+                    if powerup.powered_up:
+                        powerup.active_time = pygame.time.get_ticks()
+                        powerup.affect_player(playerCar2, screen, messages_group)
+                        powerup.affect_traffic(incoming_cars_list_left, messages_group)
+                        powerup.reshape(road_x_left, lane_width)
+
+                # Powerup isn't caught
+                elif powerup.rect.y >= SCREEN_HEIGHT:
+                    powerup.reshape(road_x_left, lane_width)
+
+        # Power up Timer --> when powerup ends, effect stops
+        current_time = pygame.time.get_ticks()
+        for powerup in incoming_powerups_list_left_road:
+            if powerup.powered_up:
+                elapsed_time = current_time - powerup.active_time
+                # Checks if we are still within powerup effect time
+                if elapsed_time < powerup.duration:
+                    # Calculate remaining time ratio
+                    remaining_ratio = (powerup.duration - elapsed_time) / powerup.duration
+                    # Scale bar width based on remaining time (orange bar decreases)
+                    powerup_bar_width = max_powerup_bar_width * remaining_ratio
+                # Powerup effect time is over
+                else:
+                    powerup.effect_over(playerCar2, incoming_cars_list_left, screen)
+                    powerup.powered_up = False
+
+                # Make visual effect of slowing last 1 milisecond (since power up picked)
+                if elapsed_time < 100:
+                    for car in incoming_cars_list_left:
+                        # Only works if power up slowing is caught
+                        if car.is_speed_reduced:
+                            # Creates a blue mask on top of every incoming car (defined in car.reshape())
+                            screen.blit(car.slowing_mask, (car.rect.x, car.rect.y))
+                # Makes cars return to normal speed before jet_bomb ends, since due to their high speed, playerCar
+                # was almost guaranteed to take a hit from cars that had already spawned before the powerup ended
+                # Cant redefine speed in powerup feature jet_bomb else, since cars start to lose fps.
+                if elapsed_time > powerup.duration - 100:
+                    for car in incoming_cars_list_left:
+                        if playerCar2.jet_bomb:
+                            car.speed = random.randint(1, 4)
+
+        # Power up countdown Bar
+        for powerup in incoming_powerups_list_left_road:
+            if powerup.powered_up:
+                pygame.draw.rect(screen, WHITE,
+                                 [powerup_bar_x - 639, powerup_bar_Y - 5, max_powerup_bar_width + 6, 34])  # border
+                pygame.draw.rect(screen, BLACK,
+                                 [powerup_bar_x - 638, powerup_bar_Y - 4, max_powerup_bar_width + 4, 32])  # background
+                pygame.draw.rect(screen, RED, [powerup_bar_x - 637, powerup_bar_Y, powerup_bar_width, 24])  # timer bar
+
+        # Power up contact with incoming cars
+        for powerup in incoming_powerups_list_left_road:
+            for car in incoming_cars_list_left:
                 # Condition to only run this code on the screen player can see
                 # ... otherwise powerup appear to fast in the screen ... and to reduce collisions we can´t see
                 if (0 <= powerup.rect.x <= SCREEN_WIDTH - powerup.rect.width and
@@ -913,6 +1102,31 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                         powerup.speed = 10 + (level - 1) * 3
 
 
+        # Invincibility Effect
+        if playerCar2.invincible:
+            screen.blit(playerCar2.mask_surface, (playerCar2.rect.x, playerCar2.rect.y))
+
+        # Jet_bomb features
+        if playerCar2.jet_bomb:
+            # Display playerCar nitro particles
+            particle4.emit(screen)
+            particle5.emit(screen)
+            particle6.emit(screen)
+            # Car goes "pilot-mode"
+            movement_enabled2 = False
+            playerCar2.moveUp(1)
+            # Doesn't let the car speed up to the top of the screen
+            if playerCar2.rect.y < 150:
+                playerCar2.moveDown(1)
+            # Increase incoming car speed (high speed effect)
+            for car in incoming_cars_list_left:
+                car.speed += 0.5
+            # Increase road velocity (high speed effect)
+            road_speed2 = 2
+        else:
+            movement_enabled2 = True
+            road_speed2 = 10
+
         all_sprites_list.update()
 
         # Draw the black ribbon for the game settings
@@ -923,10 +1137,10 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
         # Update timer
         elapsed_time = pygame.time.get_ticks() // 1000
-        minutes, seconds = divmod(elapsed_time,
-                                  60)  # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
-                                        # The quotient --> minutes, and the remainder --> seconds
-                                        # The result is unpacked into the minutes and seconds variables
+        # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
+        # The quotient --> minutes, and the remainder --> seconds
+        # The result is unpacked into the minutes and seconds variables
+        minutes, seconds = divmod(elapsed_time, 60)
         timer_text = timer_font.render("{:02}:{:02}".format(minutes, seconds), True, WHITE)
 
         # Calculate the x-coordinate to center the text
@@ -979,5 +1193,7 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     pygame.quit()  # Terminate the pygame
 
-
-
+    if not carryOn:
+        # Transition to the interface
+        from interface import interface
+        interface()
