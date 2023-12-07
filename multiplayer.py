@@ -891,7 +891,7 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             spawn_prob = random.uniform(0, 100)
 
             # Hearts --> when activated (hearts only spawn when player needs them)
-            if (0 <= spawn_prob < 20 and playerCar1.lives == 2) or (0 <= spawn_prob < 5 and playerCar1.lives == 2):
+            if (0 <= spawn_prob < 20 and playerCar1.lives == 1) or (0 <= spawn_prob < 5 and playerCar1.lives == 2):
                 power_up_extra_life_right.active = True
             # Jet Bomb
             elif 20 <= spawn_prob <= 80:
@@ -1011,7 +1011,7 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             spawn_prob = random.uniform(0, 100)
 
             # Hearts --> when activated (hearts only spawn when player needs them)
-            if (0 <= spawn_prob < 20 and playerCar2.lives == 2) or (0 <= spawn_prob < 5 and playerCar2.lives == 2):
+            if (0 <= spawn_prob < 20 and playerCar2.lives == 1) or (0 <= spawn_prob < 5 and playerCar2.lives == 2):
                 power_up_extra_life.active = True
             # Jet Bomb
             elif 20 <= spawn_prob <= 80:
