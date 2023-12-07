@@ -2,11 +2,15 @@ import pygame
 
 from game import game
 from multiplayer import *
+from button import Button
+import config
+
 
 
 def interface():
 
     pygame.init()  # Initialize the pygame
+    trigger = 0    # Trigger for the car model
 
     # EXTERNAL WINDOW:
     # Set up the screen
@@ -39,6 +43,10 @@ def interface():
     # Scale the image with the fixed aspect ratio
     background = pygame.transform.scale(background, (target_width, target_height))
 
+    #Buttons
+    login_button = Button("Login", 90, 400, 200, 60)
+    inventory_button = Button("Inventory", 610, 400, 200, 60)
+
 
     # Drawing the screen
     while True:
@@ -46,6 +54,8 @@ def interface():
         keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
+            login_button.draw(screen)
+
             if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:
                 pygame.quit()
 
@@ -56,8 +66,8 @@ def interface():
                     multiplayermenu(SCREEN_WIDTH, SCREEN_HEIGHT)
                     # gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT)
                 if 90 <= mouse[0] <= 290 and 500 <= mouse[1] <= 560:
-                    # Store
-                    pass
+                    from Store import store
+                    store(SCREEN_WIDTH, SCREEN_HEIGHT)
                 if 90 <= mouse[0] <= 290 and 600 <= mouse[1] <= 660:
                     from instructions import instructions1_
                     instructions1_(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -65,6 +75,20 @@ def interface():
                     credits_(SCREEN_WIDTH, SCREEN_HEIGHT)
                 if 610 <= mouse[0] <= 810 and 600 <= mouse[1] <= 660:
                     pygame.quit()
+                if login_button.is_clicked(event.pos):
+                    from users import prompt_player_name, user, chosen_car
+                    player_name = prompt_player_name()
+                    username = user(player_name)
+                    config.username = username
+
+
+
+                if inventory_button.is_clicked(event.pos):
+                    from Inventory import inventory
+                    inventory(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+
+
 
             screen.blit(background, (0, 0))
 

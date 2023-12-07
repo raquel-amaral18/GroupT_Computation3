@@ -1,4 +1,3 @@
-
 import random
 import pygame
 from car import *
@@ -7,12 +6,15 @@ from messages import *
 from pause import display_pause_menu
 from button import Button
 from powerups import *
+import config
+from users import chosen_car
+
 
 is_game_paused = False
 accessed_from_pause = False
 
-def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
+def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     pygame.init()  # Initialize the pygame
 
     # Pause Menu State
@@ -33,20 +35,33 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     ORANGE = (255, 159, 28)
     BLACK = (0, 0, 0)
 
-
     # Font
     timer_font = pygame.font.SysFont('monospace', 20, bold=True)
     message_font = pygame.font.SysFont('monospace', 30, bold=True)
     level_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 150)
     coins_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30)
+    game_over_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 150)
 
     messages_group = pygame.sprite.Group()
+
+    #CURRENT USER
+    username = config.username
+
+    #SELECTED CAR
+    picked_car = config.chosen_car
+
+    possible_car = ["Images/00C.png", "Images/04C.png", "Images/02C.png", "Images/05C.png", "Images/07C.png"]
+
+    # GAME OVER
+    # Background
+    game_over_background = pygame.image.load("Images/stars&planets.png")
+    game_over_background = pygame.transform.scale(game_over_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     # RIBBON - PAUSE, TIMER AND LIFE COUNTER:
     # Pause button
     pause_img = pygame.image.load("Images/pause.png").convert()
     pause_img = pygame.transform.scale(pause_img, (20, 20))
-    pause_button = Button("", 19,10, 20, 20)
+    pause_button = Button("", 19, 10, 20, 20)
 
     # Lives
     heart_img = pygame.image.load("Images/heart.png").convert()
@@ -63,17 +78,15 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     space_background = pygame.image.load("Images/space.jpeg").convert()
     space_background = pygame.transform.scale(space_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-
     # ROAD:
     num_lanes = 4  # Number of lanes
     road_width = 350  # Width of the road
     lane_width = road_width / num_lanes
     road_x = (SCREEN_WIDTH - road_width) // 2  # Distance from the road to the left of the screen
 
-
     # VEHICLES:
     # Player's car
-    playerCar = PlayerCar("Images/00C.png", 50, 3)
+    playerCar = PlayerCar(possible_car[picked_car], 50, 3)
     playerCar.rect.x = (SCREEN_WIDTH - playerCar.rect.width) // 2  # which column the car starts
     playerCar.rect.y = SCREEN_HEIGHT - 150  # which row the car starts
 
@@ -126,6 +139,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     powerup_bar_width = 162
 
     carryOn = True
+    game_over = False
 
     # Controls whether the player's input should or not be considered
     movement_enabled = True
@@ -143,7 +157,8 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     while carryOn:
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
-            if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:  # pygame.quit() checks if we pressed the red X (to leave the app)
+            if event.type == pygame.QUIT or keys[
+                pygame.K_ESCAPE]:  # pygame.quit() checks if we pressed the red X (to leave the app)
                 carryOn = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pause_button.is_clicked(event.pos):
@@ -157,8 +172,6 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
                     carryOn = False
                 elif event.key == pygame.K_p:
                     paused = not paused  # Toggle pause state
-
-
 
         if paused:
             resume_button, how_to_play_button, credits_button, quit_button = display_pause_menu(screen)
@@ -176,7 +189,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
                         from interface import interface
                         interface()  # Quit game
             continue  # Skip the rest of the game loop when paused
-            
+
         if movement_enabled:
             # Move player's car (with input from the user):
             if keys[pygame.K_LEFT]:
@@ -199,7 +212,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         # Draw background
         screen.blit(forest_background, (0, 0))
 
-        #Draw pause Button
+        # Draw pause Button
         pause_button.draw(screen)
 
         pygame.draw.rect(screen, GREY, [road_x, 0, road_width, SCREEN_HEIGHT])
@@ -241,10 +254,9 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
             if car.rect.y >= SCREEN_HEIGHT:
                 car.reshape()
 
-
         #  car_collision_list = pygame.sprite.spritecollide(playerCar, incoming_cars_list, False)  # If True --> Pacman
         # if len(car_collision_list) > 0:
-            # carryOn = False
+        # carryOn = False
         for car in incoming_cars_list:
             if not playerCar.ghost and pygame.sprite.collide_mask(playerCar, car) is not None:
                 if playerCar.pac_man:
@@ -269,9 +281,39 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
                     playerCar.rect.x = (SCREEN_WIDTH - playerCar.rect.width) // 2
                     playerCar.rect.y = SCREEN_HEIGHT - 150
                     # If no lives left --> end the game
-                    if playerCar.lives == 0:
-                        carryOn = False
+                    if playerCar.lives == 0 and not game_over:
+                        game_over = True
 
+        if game_over:
+            # Display the game-over screen
+            screen.blit(game_over_background, (0, 0))
+            game_over_text = game_over_font.render("GAME OVER", True, WHITE)
+            level_x = (SCREEN_WIDTH - game_over_text.get_width()) // 2
+            level_y = (SCREEN_HEIGHT - game_over_text.get_height()) // 2
+            screen.blit(game_over_text, (level_x, level_y))
+
+            # Load the existing high scores from the file
+            try:
+                with open('hscore.txt', 'r') as f:
+                    highscores = eval(f.read())
+                    users = list(highscores.keys())
+
+            except (FileNotFoundError, SyntaxError):
+                highscores = {}
+
+            # Check if the user already exists
+            if username in users:
+                from database import highscore
+                highscore(username, elapsed_time, coin_counter )
+
+
+            pygame.display.flip()  # Update the display
+
+            # Short delay before interface() display
+            pygame.time.delay(2000)
+
+            # The game is over, set the flag and exit the game loop
+            carryOn = False
 
         # Update invincibility status based on elapsed time
         if playerCar.ghost and not playerCar.invincible:
@@ -286,37 +328,6 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
         all_sprites_list.update()
 
-        """ 
-            2º - Permitir usar só 2 power ups ao mm tempo --> criar variável que conta os powerups apanhados --> 
-                 Quando essa variável chega a 2 ... n permitir ativar mais powerups ... smp que um power up acaba, 
-                 subtrair 1 dessa variável, para dar espaço ao próximo ... quando player tentar apanhar terceiro powerup
-                 ao mm tempo, display mensagem "FULL"
-
-            3ª -  Não deixar apanhar invincibility quando tamos usar um powerup ... n deixar apanhar jet_bomb quando 
-                  tamos a usar invincibility (vice-versa)
-
-            4º - if playerCar collides with car ... any powerup activated ends
-
-            6º - Tratar Jet_bom --> pacman type shit...collide with car = boom (tempo)
-
-            8º - Perceber coins, e ver como implementar Magnet (tempo)
-
-            9º - Ver se resolvo powerup collision com cars não funcionar 100% das vezes
-
-
-            Extras: 
-
-            - In line powerups...have 1, 2 pr 3 slotes...when player picks ups power_up while using anotehr powerup...
-            icon stored in box, whe need to click button to activate item (Mario Kart)
-
-            - Adicionar cenas à estrada, tipo borders ou textura...que muda a cada nível...em loop
-            (perceber como niveis funcionam)
-
-            -Moving Background que acompanha linhas da estrada
-            (perceber como é que funciona movimento das linhas da estrada)
-
-            -Aumentar dificuldade à medida que nível sobre (if level == 3:   car.speed = 20 ...)
-        """
         # Power up picker --> probability:
         if all(not powerup.active for powerup in incoming_powerups_list):
 
@@ -430,7 +441,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
         # Play coin sound for each collision
         # for coin_collision in coin_collision_list:
-            # Add sound
+        # Add sound
 
         # Update coin counter
         coin_counter += len(coin_collision_list)
@@ -455,9 +466,10 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
         # Update timer
         elapsed_time = pygame.time.get_ticks() // 1000
-        minutes, seconds = divmod(elapsed_time, 60)  # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
-                                                    #The quotient --> minutes, and the remainder --> seconds
-                                                    # The result is unpacked into the minutes and seconds variables
+        minutes, seconds = divmod(elapsed_time,
+                                  60)  # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
+        # The quotient --> minutes, and the remainder --> seconds
+        # The result is unpacked into the minutes and seconds variables
         timer_text = timer_font.render("{:02}:{:02}".format(minutes, seconds), True, WHITE)
 
         # Calculate the x-coordinate to center the text
