@@ -2,9 +2,9 @@ import pygame
 from button import Button
 
 
-def display_pause_menu(SCREEN_WIDTH, SCREEN_HEIGHT):
+def display_pause_menu(screen):
 
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    SCREEN_WIDTH, SCREEN_HEIGHT = 900, 700
 
     # COLORS:
     WHITE = (255, 255, 255)
@@ -13,7 +13,7 @@ def display_pause_menu(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     # PAUSE MENU:
     # Draw a semi-transparent rectangle over the entire screen
-    pause_overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+    pause_overlay = pygame.Surface(screen.get_size()).convert_alpha()
     pygame.draw.rect(pause_overlay, (0, 0, 0, 128), (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.blit(pause_overlay, (0, 0))
 
@@ -31,11 +31,14 @@ def display_pause_menu(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     # Create buttons
     resume_button = Button("RESUME", start_x, start_y,
-                           BUTTON_WIDTH, BUTTON_HEIGHT, font_size=30, text_color=BLACK, button_color=LIGHT_BLUE)
+                           BUTTON_WIDTH, BUTTON_HEIGHT, font_size=30, text_color=BLACK, button_color=LIGHT_BLUE,
+                           border_radius=0)
     how_to_play_button = Button("HOW TO PLAY", start_x, start_y + BUTTON_HEIGHT + vertical_spacing,
-                                BUTTON_WIDTH, BUTTON_HEIGHT, font_size=30, text_color=BLACK, button_color=LIGHT_BLUE)
+                                BUTTON_WIDTH, BUTTON_HEIGHT, font_size=30, text_color=BLACK, button_color=LIGHT_BLUE,
+                                border_radius=0)
     quit_button = Button("QUIT", start_x, start_y + 2 * (BUTTON_HEIGHT + vertical_spacing),
-                         BUTTON_WIDTH, BUTTON_HEIGHT, font_size=30, text_color=BLACK, button_color=LIGHT_BLUE)
+                         BUTTON_WIDTH, BUTTON_HEIGHT, font_size=30, text_color=BLACK, button_color=LIGHT_BLUE,
+                         border_radius=0)
 
     # Draw buttons
     resume_button.draw(screen)

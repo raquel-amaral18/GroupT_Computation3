@@ -5,7 +5,7 @@ from car import PlayerCar, IncomingCars
 from coins import Coin
 from messages import show_message
 from pause import display_pause_menu
-from powerups import Invincibility, SlowDown, RestoreLives, Rocket, SizeChange
+from powerups import Invincibility, SlowDown, RestoreLives, JetBomb, SizeChange
 from button import Button
 
 
@@ -59,7 +59,7 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Pause button
     pause_img = pygame.image.load("Images/Extras/pause.png").convert()
     pause_img = pygame.transform.scale(pause_img, (20, 20))
-    pause_button = Button("", 380, 5, 20, 20, font_size=0, text_color=0, button_color=(0, 0, 0, 255))  # Transparent
+    pause_button = Button("", 380, 5, 20, 20, font_size=0, text_color=0, button_color=(0, 0, 0, 255), border_radius=0)
 
     # Lives
     heart_img = pygame.image.load("Images/Extras/heart.png").convert()
@@ -87,7 +87,9 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
         pygame.image.load("Images/Design/background3.png"),
         pygame.image.load("Images/Design/background4.png"),
         pygame.image.load("Images/Design/background5.png"),
-        pygame.image.load("Images/Design/background6.png")
+        pygame.image.load("Images/Design/background6.png"),
+        pygame.image.load("Images/Design/background7.png"),
+        pygame.image.load("Images/Design/background8.png")
     ]
     resized_backgrounds = [pygame.transform.scale(bg, (SCREEN_WIDTH, SCREEN_HEIGHT)) for bg in backgrounds]
 
@@ -101,20 +103,22 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     # VEHICLES:
     # Player 1 car
-    playerCar1 = PlayerCar("Images/Vehicles/00C.png", 60, 2)
+    playerCar1 = PlayerCar("Images/Vehicles/PlayerCar/00C.png", 60, 2)
     playerCar1.rect.x = (SCREEN_WIDTH - playerCar1.rect.width) // 2 + 50  # which column the car starts
     playerCar1.rect.y = SCREEN_HEIGHT - 150  # which row the car starts
 
     # Player 2 car
-    playerCar2 = PlayerCar("Images/Vehicles/01C.png", 60, 2)
+    playerCar2 = PlayerCar("Images/Vehicles/PlayerCar/01C.png", 60, 2)
     playerCar2.rect.x = (SCREEN_WIDTH - playerCar2.rect.width) // 2 - 50  # which column the car starts
     playerCar2.rect.y = SCREEN_HEIGHT - 150  # which row the car starts
 
     # Opponent cars
-    car1 = IncomingCars("Images/Vehicles/03C.png", 0, 2, road_x + (lane_width - 50) // 2)
-    car2 = IncomingCars("Images/Vehicles/02C.png", 60, 4, road_x + lane_width + (lane_width - 50) // 2)
-    car3 = IncomingCars("Images/Vehicles/05C.png", 60, 3, road_x + (2 * lane_width) + (lane_width - 50) // 2)
-    car4 = IncomingCars("Images/Vehicles/07C.png", 60, 1, road_x + (3 * lane_width) + (lane_width - 50) // 2)
+    car1 = IncomingCars("Images/Vehicles/IncomingCars/03C.png", 60, 2, road_x + (lane_width - 50) // 2)
+    car2 = IncomingCars("Images/Vehicles/IncomingCars/02C.png", 60, 4, road_x + lane_width + (lane_width - 50) // 2)
+    car3 = IncomingCars("Images/Vehicles/IncomingCars/07C.png", 60, 3,
+                        road_x + (2 * lane_width) + (lane_width - 50) // 2)
+    car4 = IncomingCars("Images/Vehicles/IncomingCars/08C.png", 60, 1,
+                        road_x + (3 * lane_width) + (lane_width - 50) // 2)
 
     all_sprites_list = pygame.sprite.Group()
     incoming_cars_list = pygame.sprite.Group()
@@ -169,14 +173,13 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
                     paused = not paused  # Resume game
 
         if paused:
-            resume_button, how_to_play_button, quit_button = display_pause_menu(SCREEN_WIDTH, SCREEN_HEIGHT)
+            resume_button, how_to_play_button, quit_button = display_pause_menu(screen)
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if resume_button.is_clicked(event.pos):
                         paused = False  # Resume game
                     elif how_to_play_button.is_clicked(event.pos):
-                        from instructions import instructions1_
-                        instructions1_(SCREEN_WIDTH, SCREEN_HEIGHT)
+                        pass
                     elif quit_button.is_clicked(event.pos):
                         carryOn = False  # Quit game
             continue  # Skip the rest of the game loop when paused
@@ -516,25 +519,25 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     # VEHICLES:
     # Player 1 car
-    playerCar1 = PlayerCar("Images/Vehicles/00C.png", 60, 3)
+    playerCar1 = PlayerCar("Images/Vehicles/PlayerCar/00C.png", 60, 3)
     playerCar1.rect.x = right_road_center - (playerCar1.rect.width // 2)  # Center on the left road
     playerCar1.rect.y = SCREEN_HEIGHT - 150
 
     # Player 2 car
-    playerCar2 = PlayerCar("Images/Vehicles/01C.png", 60, 3)
+    playerCar2 = PlayerCar("Images/Vehicles/PlayerCar/01C.png", 60, 3)
     playerCar2.rect.x = left_road_center - (playerCar2.rect.width // 2)  # Center on the right road
     playerCar2.rect.y = SCREEN_HEIGHT - 150
 
     # Opponent cars
-    car1 = IncomingCars("Images/Vehicles/03C.png", 60, 2, road_x_left + (lane_width - 50) // 2)
-    car2 = IncomingCars("Images/Vehicles/02C.png", 60, 4, road_x_left + lane_width + (lane_width - 50) // 2)
-    car3 = IncomingCars("Images/Vehicles/05C.png", 60, 3, road_x_left + (2 * lane_width) + (lane_width - 50) // 2)
-    car4 = IncomingCars("Images/Vehicles/07C.png", 60, 1, road_x_left + (3 * lane_width) + (lane_width - 50) // 2)
+    car1 = IncomingCars("Images/Vehicles/IncomingCars/03C.png", 60, 2, road_x_left + (lane_width - 50) // 2)
+    car2 = IncomingCars("Images/Vehicles/IncomingCars/02C.png", 60, 4, road_x_left + lane_width + (lane_width - 50) // 2)
+    car3 = IncomingCars("Images/Vehicles/IncomingCars/07C.png", 60, 3, road_x_left + (2 * lane_width) + (lane_width - 50) // 2)
+    car4 = IncomingCars("Images/Vehicles/IncomingCars/08C.png", 60, 1, road_x_left + (3 * lane_width) + (lane_width - 50) // 2)
 
-    car5 = IncomingCars("Images/Vehicles/03C.png", 60, 2, road_x_right + (lane_width - 50) // 2)
-    car6 = IncomingCars("Images/Vehicles/02C.png", 60, 4, road_x_right + lane_width + (lane_width - 50) // 2)
-    car7 = IncomingCars("Images/Vehicles/05C.png", 60, 3, road_x_right + (2 * lane_width) + (lane_width - 50) // 2)
-    car8 = IncomingCars("Images/Vehicles/07C.png", 60, 1, road_x_right + (3 * lane_width) + (lane_width - 50) // 2)
+    car5 = IncomingCars("Images/Vehicles/IncomingCars/03C.png", 60, 2, road_x_right + (lane_width - 50) // 2)
+    car6 = IncomingCars("Images/Vehicles/IncomingCars/02C.png", 60, 4, road_x_right + lane_width + (lane_width - 50) // 2)
+    car7 = IncomingCars("Images/Vehicles/IncomingCars/07C.png", 60, 3, road_x_right + (2 * lane_width) + (lane_width - 50) // 2)
+    car8 = IncomingCars("Images/Vehicles/IncomingCars/08C.png", 60, 1, road_x_right + (3 * lane_width) + (lane_width - 50) // 2)
 
 
     all_sprites_list = pygame.sprite.Group()
@@ -562,13 +565,13 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     power_up_invincibility = Invincibility("Images/PowerUps/invincibility.png", 50, selected_initial_left_x_pow)
     power_up_slowing = SlowDown("Images/PowerUps/slow_down.png", 50, selected_initial_left_x_pow)
-    power_up_jet_bomb = Rocket("Images/PowerUps/rocket.png", 50, selected_initial_left_x_pow)
+    power_up_jet_bomb = JetBomb("Images/PowerUps/rocket.png", 50, selected_initial_left_x_pow)
     power_up_extra_life = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_left_x_pow)
     power_up_size_change = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_left_x_pow)
 
     power_up_invincibilityr = Invincibility("Images/PowerUps/invincibility.png", 50, selected_initial_right_x_pow)
     power_up_slowingr = SlowDown("Images/PowerUps/slow_down.png", 50, selected_initial_right_x_pow)
-    power_up_jet_bombr = Rocket("Images/PowerUps/rocket.png", 50, selected_initial_right_x_pow)
+    power_up_jet_bombr = JetBomb("Images/PowerUps/rocket.png", 50, selected_initial_right_x_pow)
     power_up_extra_lifer = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_right_x_pow)
     power_up_size_changer = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_right_x_pow)
 
