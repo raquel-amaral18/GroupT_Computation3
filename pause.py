@@ -3,7 +3,17 @@ from button import Button
 
 
 def display_pause_menu(screen):
+    """
+    Displays a pause menu overlay on the game screen.
 
+
+    Parameters:
+        screen (pygame.Surface): The pygame screen surface where the pause menu will be displayed.
+
+    Returns:
+        tuple: A tuple containing the Button objects for 'RESUME', 'HOW TO PLAY', and 'QUIT'.
+
+    """
     SCREEN_WIDTH, SCREEN_HEIGHT = 900, 700
 
     # COLORS:

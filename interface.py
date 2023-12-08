@@ -6,10 +6,33 @@ from game import game
 from multiplayer import *
 
 
-def interface():
+def find_user_with_highest_score():
+    """
+     This Function will access the database.py file and find the user with the highest score
 
+    :return: max_score_user: name of user with the highest score,
+             max_score: score from the user
+    
+     Importing the 'read_highscores' function from 'database.py'
+     """
+
+    from database import read_highscores
+
+    # Retrieving the high scores
+    highscores = read_highscores()
+
+    # Finding the user with the highest score
+    if highscores:
+        max_score_user = max(highscores, key=lambda user: highscores[user][0][0])
+        max_score = highscores[max_score_user][0][0]
+        return max_score_user, max_score
+    else:
+        return None, None
+
+
+def interface():
     pygame.init()  # Initialize the pygame
-    trigger = 0  # Trigger for the car model
+
 
     # EXTERNAL WINDOW:
     # Set up the screen
@@ -30,10 +53,10 @@ def interface():
     game_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 60).render("PLAY", True, BLACK)
     multi_player_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 35).render("MULTIPLAYER", True, BLACK)
     store_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30).render("STORE", True, BLACK)
-    instructions_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30).render("HOW TO PLAY?", True, BLACK)
+    instructions_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30).render("HOW TO PLAY?", True,
+                                                                                             BLACK)
     credits_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30).render("CREDITS", True, BLACK)
     quit_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30).render("QUIT", True, BLACK)
-
 
     # MUSIC AND SOUNDS
     # Load background music
@@ -41,7 +64,6 @@ def interface():
         pygame.mixer.music.load("Music&Sounds/background_music_menus.mp3")
         pygame.mixer.music.set_volume(0.2)  # Set the volume
         pygame.mixer.music.play(-1)  # Play the background music on loop
-
 
     # IMAGES:
     # Background
@@ -196,10 +218,17 @@ def interface():
             pygame.draw.rect(screen, LIGHT_YELLOW, [670, 400, 60, 60], border_radius=100)
             screen.blit(music_button_image, (680, 410))
 
+            # Displays the user with the highest score in the menu
+            max_score_user, max_score = find_user_with_highest_score()
+            if max_score_user is not None:
+                font = pygame.font.SysFont(None, 30)
+                text = font.render(f"{max_score} by {max_score_user}", True, (179, 145, 50))
+                screen.blit(text, (85, 325))  # Adjust the position (100, 100) as needed
+                pygame.display.update()
+
             # Draw diagonal line when music is not playing
             if not config.is_music_enabled:
                 pygame.draw.line(screen, MAASTRICHT_BLUE, (670, 400), (730, 460), 7)
-
 
         pygame.display.update()
 
@@ -226,14 +255,12 @@ def multiplayer_menu(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Scale the image with the fixed aspect ratio
     background = pygame.transform.scale(background, (target_width, target_height))
 
-
     # TEXT
-    road1_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30)\
+    road1_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30) \
         .render("SINGLE ROAD", True, BLACK)
-    road2_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30)\
-        .render("TWO-ROADS", True,BLACK)
+    road2_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30) \
+        .render("TWO-ROADS", True, BLACK)
     back_text = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 50).render("X", True, BLACK)
-
 
     # BUTTONS
     BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
@@ -247,8 +274,8 @@ def multiplayer_menu(SCREEN_WIDTH, SCREEN_HEIGHT):
                 pygame.quit()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2 <= mouse[0]\
-                        <= SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2 + BUTTON_WIDTH\
+                if SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2 <= mouse[0] \
+                        <= SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2 + BUTTON_WIDTH \
                         and 350 <= mouse[1] <= 350 + BUTTON_HEIGHT:
                     gameMP(SCREEN_WIDTH, SCREEN_HEIGHT)
                 elif SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2 <= mouse[0] \
@@ -296,7 +323,6 @@ def multiplayer_menu(SCREEN_WIDTH, SCREEN_HEIGHT):
         pygame.draw.rect(screen, DARK_BLUE if (660 <= mouse[0] <= 710 and 220 <= mouse[1] <= 270) else LIGHT_BLUE,
                          [660, 220, 50, 50], border_radius=24)
         screen.blit(back_text, (673, 213))
-
 
         pygame.display.update()
 

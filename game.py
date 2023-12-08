@@ -15,6 +15,7 @@ from button import Button
 from particles import *
 from coins import Coin
 from messages import show_message
+import time
 
 is_game_pause = False
 
@@ -34,6 +35,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     WHITE = (255, 255, 255)
     RED = (249, 65, 68)
     ORANGE = (255, 159, 28)
+    LIGHT_BLUE = (65, 163, 187)
 
     # Font
     timer_font = pygame.font.SysFont('monospace', 20, bold=True)
@@ -71,6 +73,14 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Lives
     heart_img = pygame.image.load("Images/Extras/heart.png").convert()
     heart_img = pygame.transform.scale(heart_img, (20, 20))
+
+    #Score
+    score = 0
+    updated_score = 0
+
+    #TIME
+    frame_count = 0
+    start_time = time.time()
 
     # FOOTER - COIN COUNTER:
     # Coins
@@ -146,7 +156,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     power_up_invincibility = Invincibility("Images/PowerUps/invincibility.png", 50, selected_initial_x_pow)
     power_up_slowing = SlowDown("Images/PowerUps/slow_down.png", 50, selected_initial_x_pow)
-    power_up_jet_bomb = JetBomb("Images/PowerUps/jet_bomb.png", 50, selected_initial_x_pow)
+    power_up_jet_bomb = JetBomb("Images/PowerUps/rocket.png", 50, selected_initial_x_pow)
     power_up_extra_life = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_x_pow)
     power_up_size_change = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_x_pow)
 
@@ -241,8 +251,9 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
                         # instructions_(SCREEN_WIDTH, SCREEN_HEIGHT)
                         paused = False
                     elif quit_button.is_clicked(event.pos):
-                        from interface import interface
-                        interface()  # Quit game
+                        carryOn = False
+
+            # The game is over, set the flag and exit the game loop
             continue  # Skip the rest of the game loop when paused
 
         if movement_enabled:
@@ -350,7 +361,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
             # Check if the user already exists
             if username in users:
                 from database import highscore
-                highscore(username, elapsed_time, coin_counter)
+                highscore(username, updated_score, coin_counter)
 
             pygame.display.flip()  # Update the display
 
@@ -535,11 +546,11 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
                                   60)  # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
         # The quotient --> minutes, and the remainder --> seconds
         # The result is unpacked into the minutes and seconds variables
-        timer_text = timer_font.render("{:02}:{:02}".format(minutes, seconds), True, WHITE)
+        score_text = timer_font.render("{:02}".format(updated_score), True, WHITE)
 
         # Calculate the x-coordinate to center the text
-        timer_x = (SCREEN_WIDTH - timer_text.get_width()) // 2
-        screen.blit(timer_text, (timer_x, 5))
+        score_x = (SCREEN_WIDTH - score_text.get_width()) // 2
+        screen.blit(score_text, (score_x, 5))
 
         # Level upgrade
         if minutes > last_minute:
@@ -579,6 +590,10 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         # Draw and update messages
         messages_group.draw(screen)
         messages_group.update()
+
+        #Update score
+        score += 1
+        updated_score = score // 60
 
         pygame.display.flip()  # Refresh the screen
         clock.tick(60)  # 60 frame per millisecond

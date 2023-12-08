@@ -3,6 +3,13 @@ import sys
 
 
 def prompt_player_name():
+    """
+    Function for the player to input his/her name
+
+
+    Returns:
+        str: The player's name
+    """
     # Function to prompt for player's name
     pygame.font.init()
 
@@ -58,6 +65,17 @@ def prompt_player_name():
 
 
 def user(name):
+    """
+    Loads the player's information if he already exists in the file 'hscore.txt' or adds a new player with default
+    values if the name doesn't exist yet.
+
+
+    Parameters:
+        name (str): The name of the player.
+
+    Returns:
+        str: The name of the player. this name can already exist or be created in the function.
+    """
     users = []
 
     # Loads the file
@@ -79,6 +97,15 @@ def user(name):
 
 
 def chosen_car(name):
+    """
+    Retrieves the selected car for the player from the file.
+
+    Parameters:
+        name (str): The name of the player.
+
+    Returns:
+        int or None: The index of the selected car if the player is found, if there is not no player found return none.
+    """
     # Load the existing high scores from the file
     try:
         with open('hscore.txt', 'r') as f:

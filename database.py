@@ -1,4 +1,13 @@
 def highscore(playername, score, coins):
+    """
+    This function updates the high score file with the latest score and coins for a given player.
+
+    :param playername (str): the name of the player
+    :param score (int): score the player got in the game
+    :param coins (int): coins that the player got in the game
+
+    :return: None
+    """
     # Load the existing high scores from the file
     try:
         with open('hscore.txt', 'r') as f:
@@ -25,6 +34,14 @@ def highscore(playername, score, coins):
 
 
 def read_highscores():
+    """
+    This function will open the file and red the highscore from all the players and return it
+
+    :return:
+        dict: A dictionary containing player names as keys and their corresponding high scores, if the file is not found
+        or a syntax error occurs it returns an empty dictionary.
+
+    """
     try:
         with open('hscore.txt', 'r') as f:
             return eval(f.read())
