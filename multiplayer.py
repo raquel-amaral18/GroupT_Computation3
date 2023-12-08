@@ -45,14 +45,18 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     # MUSIC AND SOUNDS
     # Load background music
-    pygame.mixer.music.load("Music&Sounds/background_music.mp3")
-    pygame.mixer.music.set_volume(0.2)  # Set the volume
-    pygame.mixer.music.play(-1)  # Play the background music on loop
+    if config.is_music_enabled:
+        pygame.mixer.music.load("Music&Sounds/background_music.mp3")
+        pygame.mixer.music.set_volume(0.2)  # Set the volume
+        pygame.mixer.music.play(-1)  # Play the background music on loop
 
     # Load sounds
-    catch_coin = pygame.mixer.Sound("Music&Sounds/catch_coin.wav")
-    car_collision = pygame.mixer.Sound("Music&Sounds/car_collision.flac")
-    level_up = pygame.mixer.Sound("Music&Sounds/level_up.wav")
+    if config.is_sound_enabled:
+        catch_coin = pygame.mixer.Sound("Music&Sounds/catch_coin.wav")
+        car_collision = pygame.mixer.Sound("Music&Sounds/car_collision.flac")
+        level_up = pygame.mixer.Sound("Music&Sounds/level_up.wav")
+        catch_powerup = pygame.mixer.Sound("Music&Sounds/catch_powerup.wav")
+        jet_bomb = pygame.mixer.Sound("Music&Sounds/jet_bomb.mp3")
 
     # GAME OVER
     # Background
@@ -270,7 +274,8 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
         for car in incoming_cars_list:
             if not playerCar1.ghost and pygame.sprite.collide_mask(playerCar1, car) is not None:
                 # Collision detected
-                car_collision.play()
+                if config.is_sound_enabled:
+                    car_collision.play()
                 playerCar1.lives -= 1
                 show_message(messages_group, "-1", message_font, (playerCar1.rect.x, playerCar1.rect.y), BLUE)
                 # Activate invincibility for 5 seconds after collision
@@ -285,7 +290,8 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
         for car in incoming_cars_list:
             if not playerCar2.ghost and pygame.sprite.collide_mask(playerCar2, car) is not None:
                 # Collision detected for player 2
-                car_collision.play()
+                if config.is_sound_enabled:
+                    car_collision.play()
                 playerCar2.lives -= 1
                 show_message(messages_group, "-1", message_font, (playerCar2.rect.x, playerCar2.rect.y), RED)
                 # Activate invincibility for 5 seconds after collision for player 2
@@ -376,7 +382,7 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
             playerCar2.lives += coin_counter2 // 10
             coin_counter2 %= 10  # Reset the counter after gaining extra lives
 
-        if coin_collision_list1 or coin_collision_list2:
+        if (coin_collision_list1 or coin_collision_list2) and config.is_sound_enabled:
             catch_coin.play()
 
         # Display coin counters
@@ -430,7 +436,8 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
             screen.blit(level_text, (level_x, level_y))
 
             # Play level-up sound
-            level_up.play()
+            if config.is_sound_enabled:
+                level_up.play()
 
             pygame.display.flip()  # Update the full display Surface to the screen
 
@@ -484,9 +491,33 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     timer_font = pygame.font.SysFont('monospace', 20, bold=True)
     message_font = pygame.font.SysFont('monospace', 30, bold=True)
     level_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 150)
-    game_over = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 50)
+    game_over_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 150)
+    winner_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 70)
 
     messages_group = pygame.sprite.Group()
+
+
+    # MUSIC AND SOUNDS
+    # Load background music
+    if config.is_music_enabled:
+        pygame.mixer.music.load("Music&Sounds/background_music.mp3")
+        pygame.mixer.music.set_volume(0.2)  # Set the volume
+        pygame.mixer.music.play(-1)  # Play the background music on loop
+
+    # Load sounds
+    if config.is_sound_enabled:
+        catch_coin = pygame.mixer.Sound("Music&Sounds/catch_coin.wav")
+        car_collision = pygame.mixer.Sound("Music&Sounds/car_collision.flac")
+        level_up = pygame.mixer.Sound("Music&Sounds/level_up.wav")
+        catch_powerup = pygame.mixer.Sound("Music&Sounds/catch_powerup.wav")
+        jet_bomb = pygame.mixer.Sound("Music&Sounds/jet_bomb.mp3")
+
+
+    # GAME OVER
+    # Background
+    game_over_background = pygame.image.load("Images/Design/stars&planets.png")
+    game_over_background = pygame.transform.scale(game_over_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 
     # RIBBON - TIMER AND LIFE COUNTER:
     # Pause button
@@ -621,8 +652,6 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     particle5 = Particle(pygame.Color('orange'))
     particle6 = Particle(pygame.Color('yellow'))
 
-    carryOn = True
-
     # Controls whether the player's input should or not be considered
     movement_enabled1 = True
     movement_enabled2 = True
@@ -630,18 +659,16 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Variable to track the active power-up
     active_powerup = None
 
-    # GAME OVER:
-    # Controls whether player's game is on
-    player1_game_over = False
-    player2_game_over = False
-
-    # Controls wheter there is incoming cars
-    spawn_cars_right = True
-    spawn_cars_left = True
-
     # Game level
     level = 1
     last_minute = 0
+
+    # Winner
+    winner = None
+
+    # Game State
+    carryOn = True
+    game_over = False
 
     clock = pygame.time.Clock()  # How fast the screen resets (how many times you repeat the loop per second)
 
@@ -677,15 +704,13 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                 particle6.add_particles(playerCar2.rect.x, playerCar2.rect.y)
 
         if paused:
-            resume_button, how_to_play_button, credits_button, quit_button = display_pause_menu(screen)
+            resume_button, how_to_play_button, quit_button = display_pause_menu(screen)
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if resume_button.is_clicked(event.pos):
                         paused = False  # Resume game
                     elif how_to_play_button.is_clicked(event.pos):
                         pass
-                    elif credits_button.is_clicked(event.pos):
-                        paused = False  # Resume game
                     elif quit_button.is_clicked(event.pos):
                         carryOn = False  # Quit game
             continue  # Skip the rest of the game loop when paused
@@ -761,8 +786,8 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             player_car_list2.draw(screen)
 
         # Draw Power ups
-        incoming_powerups_list_left_road.draw(screen)
         incoming_powerups_list_right_road.draw(screen)
+        incoming_powerups_list_left_road.draw(screen)
 
         # Move the opponent cars (automatically):
         for car in incoming_cars_list_right:
@@ -800,6 +825,8 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     explosion_group.add(explosion)
 
                 if not playerCar1.invincible and not playerCar1.jet_bomb:
+                    if config.is_sound_enabled:
+                        car_collision.play()
                     # Collision detected
                     playerCar1.lives -= 1
                     show_message(messages_group, "-1", message_font, (playerCar1.rect.x, playerCar1.rect.y), RED)
@@ -815,7 +842,7 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     playerCar1.rect.y = SCREEN_HEIGHT - 150
                     # If no lives left --> end the game
                     if playerCar1.lives == 0:
-                        player1_game_over = True
+                        game_over = True
 
         # Handle collisions with PlayerCar2
         for car in incoming_cars_list_left:
@@ -831,6 +858,8 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     explosion_group.add(explosion)
 
                 if not playerCar2.invincible and not playerCar2.jet_bomb:
+                    if config.is_sound_enabled:
+                        car_collision.play()
                     # Collision detected
                     playerCar2.lives -= 1
                     show_message(messages_group, "-1", message_font, (playerCar2.rect.x, playerCar2.rect.y), RED)
@@ -845,7 +874,36 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     playerCar2.rect.y = SCREEN_HEIGHT - 150
                     # If no lives left --> end the game
                     if playerCar2.lives == 0:
-                        player2_game_over = True
+                        game_over = True
+
+            if game_over:
+                if playerCar1.lives > 0:
+                    winner = "Player 1 wins!"
+                elif playerCar2.lives > 0:
+                    winner = "Player 2 wins!"
+
+                # Display the game-over screen
+                screen.blit(game_over_background, (0, 0))
+
+                # Game over text
+                game_over_text = game_over_font.render("GAME OVER", True, WHITE)
+                game_over_x = (SCREEN_WIDTH - game_over_text.get_width()) // 2
+                game_over_y = (SCREEN_HEIGHT - game_over_text.get_height()) // 2
+                screen.blit(game_over_text, (game_over_x, game_over_y))
+
+                # Winner text
+                winner_text = winner_font.render(f"{winner}", True, WHITE)
+                winner_x = (SCREEN_WIDTH - winner_text.get_width()) // 2
+                winner_y = game_over_y + game_over_text.get_height() + 20
+                screen.blit(winner_text, (winner_x, winner_y))
+
+                pygame.display.flip()  # Update the display
+
+                # Short delay before interface() display
+                pygame.time.delay(2000)
+
+                # The game is over, set the flag and exit the game loop
+                carryOn = False
 
         # Update invincibility status based on elapsed time
         # Player car 1
@@ -869,20 +927,6 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                 playerCar2.visible = (elapsed_time // toggle_interval) % 2 == 0
 
         all_sprites_list.update()
-
-        # Check if both players have lost all lives
-        if player1_game_over and player2_game_over:
-            carryOn = False
-        elif player1_game_over:
-            playerCar1.visible = False
-            spawn_cars_right = False
-            text = game_over.render("Player 1 Game Over", True, RED)
-            screen.blit(text, (road_x_right, SCREEN_HEIGHT // 2 - text.get_height() // 2))
-        elif player2_game_over:
-            playerCar2.visible = False
-            spawn_cars_left = False
-            text = game_over.render("Player 2 Game Over", True, RED)
-            screen.blit(text, (road_x_left, SCREEN_HEIGHT // 2 - text.get_height() // 2))
 
 
         # Power up picker --> probability for Right Road:
@@ -914,7 +958,8 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                 powerup.moveDown(powerup.speed)
 
                 if pygame.sprite.collide_mask(playerCar1, powerup) is not None:
-
+                    if config.is_sound_enabled:
+                        catch_powerup.play()
                     powerup.powered_up = True
 
                     if powerup.powered_up:
@@ -986,6 +1031,8 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
         # Jet_bomb features
         if playerCar1.jet_bomb:
+            if config.is_sound_enabled:
+                jet_bomb.play()
             # Display playerCar nitro particles
             particle1.emit(screen)
             particle2.emit(screen)
@@ -1034,7 +1081,8 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                 powerup.moveDown(powerup.speed)
 
                 if pygame.sprite.collide_mask(playerCar2, powerup) is not None:
-
+                    if config.is_sound_enabled:
+                        catch_powerup.play()
                     powerup.powered_up = True
 
                     if powerup.powered_up:
@@ -1107,6 +1155,8 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
         # Jet_bomb features
         if playerCar2.jet_bomb:
+            if config.is_sound_enabled:
+                jet_bomb.play()
             # Display playerCar nitro particles
             particle4.emit(screen)
             particle5.emit(screen)
@@ -1166,6 +1216,10 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             level_x = (SCREEN_WIDTH - level_text.get_width()) // 2
             level_y = (SCREEN_HEIGHT - level_text.get_height()) // 2
             screen.blit(level_text, (level_x, level_y))
+
+            # Play level-up sound
+            if config.is_sound_enabled:
+                level_up.play()
 
             pygame.display.flip()  # Update the full display Surface to the screen
 

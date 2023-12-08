@@ -1,5 +1,6 @@
 import pygame
-import sys
+
+from button import Button
 
 
 def prompt_player_name():
@@ -18,22 +19,40 @@ def prompt_player_name():
     SCREEN_HEIGHT = 700
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+    # GAME SETTINGS:
+    # colors
+    BLACK = (0, 0, 0)
+    MAASTRICHT_BLUE = (3, 23, 48)
+    LIGHT_BLUE = (65, 163, 187)
 
-    font = pygame.font.SysFont('Arial', 32)
+
+    font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30)
     clock = pygame.time.Clock()
     input_box = pygame.Rect(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 20, 200, 40)
     color_inactive = pygame.Color('lightskyblue3')
-    color_active = pygame.Color('dodgerblue2')
+    color_active = LIGHT_BLUE
     color = color_inactive
     active = False
     text = ''
+
+    # Create a return button in the top right corner
+    return_button = Button("X", SCREEN_WIDTH - 100, 100, 50, 50, 50, MAASTRICHT_BLUE, LIGHT_BLUE, border_radius=100)
+
+    # Enter
+    enter_size = (40, 40)
+    enter = pygame.image.load("Images/Extras/enter.png")
+    enter = pygame.transform.scale(enter, enter_size)
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
+
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if return_button.is_clicked(event.pos):
+                    from interface import interface
+                    interface()
+
                 if input_box.collidepoint(event.pos):
                     # Toggle the active variable.
                     active = not active
@@ -50,8 +69,12 @@ def prompt_player_name():
                     else:
                         text += event.unicode
 
-        screen.fill((30, 30, 30))
-        # Render the current text.
+        screen.fill(MAASTRICHT_BLUE)
+        return_button.draw(screen)
+        username_text = font.render("Username:", True, pygame.Color('lightskyblue3'))
+        screen.blit(username_text, (395, 290))
+
+        # Render the current text inside box
         txt_surface = font.render(text, True, color)
         # Resize the box if the text is too long.
         width = max(200, txt_surface.get_width()+10)
@@ -60,6 +83,9 @@ def prompt_player_name():
         screen.blit(txt_surface, (input_box.x+5, input_box.y+5))
         # Blit the input_box rect.
         pygame.draw.rect(screen, color, input_box, 2)
+
+        # Enter
+        screen.blit(enter, (550, 380))
 
         pygame.display.flip()
         clock.tick(30)

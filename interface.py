@@ -236,7 +236,7 @@ def interface():
             # Displays the user with the highest score in the menu
             max_score_user, max_score = find_user_with_highest_score()
             if max_score_user is not None:
-                hs_text = high_score_font.render(f"{max_score}p", True, LIGHT_BLUE)
+                hs_text = high_score_font.render(f"{max_score}", True, LIGHT_BLUE)
                 hs_person_text = high_score_font.render(f"{max_score_user}", True, LIGHT_BLUE)
                 screen.blit(hs_text, (150, 300))
                 screen.blit(hs_person_text, (130, 340))
