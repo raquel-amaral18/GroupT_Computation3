@@ -382,6 +382,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
             except (FileNotFoundError, SyntaxError):
                 highscores = {}
+                users = []
 
             # Check if the user already exists
             if username in users:
