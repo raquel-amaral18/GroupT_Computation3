@@ -193,18 +193,18 @@ In this mode, players have two options to choose from:
 </div>
 
 - **Effect:** Reverse your controls. 
-- **Duration:** 8 seconds
+- **Duration:** 3 seconds
 
 <br>
 
-8. **Key Inversion:**
+8. **Invisibility:**
 
 <div style="text-align:center;">
     <img src="Images/PowerUps/invisible.png" width="50">
 </div>
 
 - **Effect:** Your car becomes invisible. 
-- **Duration:** 8 seconds
+- **Duration:** 3 seconds
 
 <br>
 
@@ -215,7 +215,7 @@ In this mode, players have two options to choose from:
 </div>
 
 - **Effect:** You can’t get new powerUps while it's active. 
-- **Duration:** 8 seconds
+- **Duration:** 4 seconds
 
 > **Note:** You can hold up to two power-ups at a time. However, the second power-up will remain stored until you decide to use it. To use stored power-ups press **'Shift'+ 'L'** or **'Shift'+ 'R'**, if you are Player 2 in the multiplayer mode.
 
