@@ -193,7 +193,14 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
                     if resume_button.is_clicked(event.pos):
                         paused = False  # Resume game
                     elif how_to_play_button.is_clicked(event.pos):
-                        pass
+                        screen.blit(pygame.image.load("Images/Design/instructions_pause.png"),(0, 0))
+                        pygame.display.flip()  # Update the screen to show changes
+
+                        waiting_for_click = True
+                        while waiting_for_click:
+                            for event in pygame.event.get():  # Event handling loop
+                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                    waiting_for_click = False
                     elif quit_button.is_clicked(event.pos):
                         carryOn = False  # Quit game
             continue  # Skip the rest of the game loop when paused
@@ -748,7 +755,14 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     if resume_button.is_clicked(event.pos):
                         paused = False  # Resume game
                     elif how_to_play_button.is_clicked(event.pos):
-                        pass
+                        screen.blit(pygame.image.load("Images/Design/instructions_pause.png"),(0, 0))
+                        pygame.display.flip()  # Update the screen to show changes
+
+                        waiting_for_click = True
+                        while waiting_for_click:
+                            for event in pygame.event.get():  # Event handling loop
+                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                    waiting_for_click = False
                     elif quit_button.is_clicked(event.pos):
                         carryOn = False  # Quit game
             continue  # Skip the rest of the game loop when paused

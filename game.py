@@ -105,6 +105,8 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         pygame.image.load("Images/Design/background7.png"),
         pygame.image.load("Images/Design/background8.png")
     ]
+
+
     num_backgrounds = len(backgrounds)
     resized_backgrounds = [pygame.transform.scale(bg, (SCREEN_WIDTH, SCREEN_HEIGHT)) for bg in backgrounds]
 
@@ -258,9 +260,14 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
                     if resume_button.is_clicked(event.pos):
                         paused = False  # Resume game
                     elif how_to_play_button.is_clicked(event.pos):
-                        from instructions import instructions_
-                        instructions_(SCREEN_WIDTH, SCREEN_HEIGHT)
-                        paused = False
+                        screen.blit(pygame.image.load("Images/Design/instructions_pause.png"),(0, 0))
+                        pygame.display.flip()  # Update the screen to show changes
+
+                        waiting_for_click = True
+                        while waiting_for_click:
+                            for event in pygame.event.get():  # Event handling loop
+                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                    waiting_for_click = False
                     elif quit_button.is_clicked(event.pos):
                         # The game is over, set the flag and exit the game loop
                         carryOn = False
