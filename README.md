@@ -7,7 +7,7 @@
 
 </div>
 <div style="text-align:center;">
-    <img src="Images/interface_readme.png" alt="Photo" width="600">
+    <img src="Images/Design/interface_readme.png" alt="Photo" width="600">
 </div>
 
 <!-- ABOUT THE PROJECT -->
@@ -102,10 +102,13 @@ Please note that these instructions are tailored for Windows users. If you are u
 #### Singleplayer mode:
 - Use **arrow keys** to move your car in the desired direction.
 - Other cars will be coming towards you from the opposite direction. To survive, you have to avoid colliding with them.
-- Aside from cars, you might come across **coins** or **power-ups** as well. The more coins you collect, the higher your score will be. Collecting power-ups will grant you a **temporary** advantage.
+- Collect **power-ups** for temporary advantages. You can hold up to two power-ups at a time. However, the second power-up will remain stored until you decide to use it. To use stored power-ups press **'Shift'+ 'L'**.
+- You will also come across **coins**, which, if registered with a username, can be used to purchase cars from the store.
+- Bought cars will appear in your inventory, allowing you to select your preferred vehicle for gameplay. 
+
 
 #### Multiplayer mode:
-In this mode, players have two exciting options to choose from:
+In this mode, players have two options to choose from:
 1. **Single Road:**
    - **Player 1:** Use arrow keys to control your car. 
    - **Player 2:** Use 'WASD' keys to navigate your car.
@@ -117,17 +120,17 @@ In this mode, players have two exciting options to choose from:
 2. **Double Road:**
    - **Player 1:** Use arrow keys for your right highway.
    - **Player 2:** Use 'WASD' keys for your left highway.
-   - Engage in a thrilling race where the goal is to outlast your opponent. In case one of the players crash, the other will be able to continue playing. The main goal will be to **survive longer** than the other player.
-   - Two separate highways present different obstacles and opportunities for each player.
-   - Each player starts with 3 lives, and the one who survives the longest emerges victorious.
+   - The main goal will be to **survive longer** than the other player.
+   - Each road presents different obstacles and opportunities for each player.
+   - In this mode powerUps offer additional abilities when 'good' or impose temporary conditions on the opponent when 'bad'. 
+   - Each player can hold up to two power-ups at a time. However, the second power-up will remain stored until you decide to use it. To use stored power-ups press **'Shift'+ 'L'** if you are **Player 1** and **'Shift'+ 'R'** if you are **Player 2**.
 
   Invite a friend to play with you, and let the race begin! Will you be the ultimate champion of the roads?
 
 
 <!--POWER-UPS -->
 ## Power-Ups
-
-Enhance your racing experience with these exciting powerups! Collect them during the game to gain unique advantages.
+ Collect power-ups during the game to gain unique advantages.
 
 1. **Invincibility:**
 
@@ -136,7 +139,7 @@ Enhance your racing experience with these exciting powerups! Collect them during
 </div>
 
 - **Effect:** Gain temporary invincibility, protecting your car from collisions.
-- **Duration:** 10 seconds
+- **Duration:** 4 seconds
 
 <br>
 
@@ -147,7 +150,7 @@ Enhance your racing experience with these exciting powerups! Collect them during
 </div>
 
 - **Effect:** Force incoming cars to slow down, making it easier to navigate through the traffic.
-- **Duration:** 8 seconds
+- **Duration:** 3 seconds
 
 <br>
 
@@ -161,39 +164,60 @@ Enhance your racing experience with these exciting powerups! Collect them during
 
 <br>
 
-4. **Magnet:**
-
-<div style="text-align:center;">
-    <img src="Images/PowerUps/magnet.png" width="50">
-</div>
-
-- **Effect:** Attract nearby coins to boost your coin count.
-- **Duration:** 15 seconds
-
-<br>
-
-5. **Jet Bomb:**
+4. **Jet Bomb:**
 
 <div style="text-align:center;">
     <img src="Images/PowerUps/jet_bomb.png" width="50">
 </div>
 
 - **Effect:** Propel your car forward at high speed, causing explosions with incoming cars when you collide.
-- **Duration:** 5 seconds
-- **Time Warp:** Speed up the game clock by 2 times during the Jet Bomb activation.
+- **Duration:** 4 seconds
 
 <br>
 
-6. **Shrink:**
+6. **Size Change:**
 
 <div style="text-align:center;">
-    <img src="Images/PowerUps/shrink.png" width="50">
+    <img src="Images/PowerUps/change_size.png" width="50">
 </div>
 
 - **Effect:** Decrease the size of your car, making it easier to navigate through tight spaces.
+- **Duration:** 3 seconds
+
+<br>
+
+7. **Key Inversion:**
+
+<div style="text-align:center;">
+    <img src="Images/PowerUps/key_inversion.png" width="50">
+</div>
+
+- **Effect:** Reverse your controls. 
 - **Duration:** 8 seconds
 
-> **Note:** You can catch multiple power-ups simultaneously, either of the same type for extended duration or different types for combined effects.
+<br>
+
+8. **Key Inversion:**
+
+<div style="text-align:center;">
+    <img src="Images/PowerUps/invisible.png" width="50">
+</div>
+
+- **Effect:** Your car becomes invisible. 
+- **Duration:** 8 seconds
+
+<br>
+
+8. **No-Powers:**
+
+<div style="text-align:center;">
+    <img src="Images/PowerUps/no_powerup.png" width="50">
+</div>
+
+- **Effect:** You can’t get new powerUps while it's active. 
+- **Duration:** 8 seconds
+
+> **Note:** You can hold up to two power-ups at a time. However, the second power-up will remain stored until you decide to use it. To use stored power-ups press **'Shift'+ 'L'** or **'Shift'+ 'R'**, if you are Player 2 in the multiplayer mode.
 
 
 <!--OPEN ISSUES -->
@@ -202,10 +226,7 @@ Enhance your racing experience with these exciting powerups! Collect them during
 These are areas where improvements or additional features could be considered. While they may not be critical for the fundamental functionality of the game, addressing these items could enhance the overall user experience and contribute to the project's growth:
 
 - [ ] Code Optimization
-- [x] Example 2
-- [x] Example 3
-- [ ] Example 4
-- [ ] Example 5
+- [ ] Add more cars to the store
 
 
 <!-- CONTRIBUTING -->
