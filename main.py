@@ -1,8 +1,11 @@
-from game import game
+from interface import interface
 
 
 def main():
-    game()
+    """
+        Serves as the entry point for the application. It calls interface, the starting menu
+    """
+    interface()
 
 
 if __name__ == '__main__':
