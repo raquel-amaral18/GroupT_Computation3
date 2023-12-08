@@ -1,0 +1,7 @@
+The class "Explosion" was adapted from the user "russs123"
+Source: "https://github.com/russs123/Explosion"
+There is no explicit license attached to the GitHub repository; however, the code appears to be intended for public use, as evidenced by its promotion in this YouTube video by the creator: "https://www.youtube.com/watch?v=d06aVDzOfV8&t=9s".
+
+The class "Particles" was adapted from the user "clear-code-project"
+Source: "https://github.com/clear-code-projects/PygameParticles"
+There is no explicit license attached to the GitHub repository; however, the code appears to be intended for public use, as evidenced by its promotion in this YouTube video by the creator: "https://www.youtube.com/watch?v=yfcsB3SGsKY&t=1002s".
