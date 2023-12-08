@@ -80,10 +80,6 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     score = 0
     updated_score = 0
 
-    #TIME
-    frame_count = 0
-    start_time = time.time()
-
 
     # FOOTER - COIN COUNTER:
     # Coins
@@ -200,7 +196,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     # Game level
     level = 1
-    last_minute = 0
+    first_lvl_up = 60
 
     # Pause Menu State
     paused = False
@@ -210,13 +206,9 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
     game_over = False
 
     clock = pygame.time.Clock()  # How fast the screen resets (how many times you repeat the loop per second)
-    beginning = None
+
     # Game loop:
     while carryOn:
-
-        if beginning is None:
-            if beginning is None:
-                beginning = pygame.time.get_ticks() // 1000
 
         keys = pygame.key.get_pressed()
 
@@ -545,12 +537,6 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         pause_button.draw(screen)
         screen.blit(pause_img, (15, 5))
 
-        # Update timer
-        elapsed_time = pygame.time.get_ticks() // 1000 - beginning
-        minutes, seconds = divmod(elapsed_time,
-                                  60)  # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
-        # The quotient --> minutes, and the remainder --> seconds
-        # The result is unpacked into the minutes and seconds variables
         score_text = score_font.render(f"{updated_score}", True, WHITE)
 
         # Calculate the x-coordinate to center the text
@@ -558,10 +544,10 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         screen.blit(score_text, (score_x, 5))
 
         # Level upgrade
-        if minutes > last_minute:
+        if updated_score == first_lvl_up:
             # Increase the level every minute
             level += 1
-            last_minute = minutes
+            first_lvl_up = first_lvl_up + 60
 
             # Increase playerCar speed
             playerCar.speed += 1
@@ -578,8 +564,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
             screen.blit(level_text, (level_x, level_y))
 
             # Play level-up sound
-            if config.is_sound_enabled:
-                level_up.play()
+            level_up.play()
 
             pygame.display.flip()  # Update the full display Surface to the screen
 

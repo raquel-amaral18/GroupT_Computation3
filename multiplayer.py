@@ -33,7 +33,7 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
     ORANGE = (255, 159, 28)
     
     # Font
-    timer_font = pygame.font.SysFont('monospace', 20, bold=True)
+    score_font = pygame.font.SysFont('monospace', 20, bold=True)
     message_font = pygame.font.SysFont('monospace', 30, bold=True)
     level_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 150)
     coins_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 30)
@@ -75,6 +75,11 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
     heart_img = pygame.transform.scale(heart_img, (20, 20))
 
 
+    #Score
+    score = 0
+    updated_score = 0
+
+
     # FOOTER - COIN COUNTER:
     # Coins
     coin_image = pygame.image.load("Images/Extras/coin.png")
@@ -100,6 +105,7 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
         pygame.image.load("Images/Design/background7.png"),
         pygame.image.load("Images/Design/background8.png")
     ]
+    num_backgrounds = len(backgrounds)
     resized_backgrounds = [pygame.transform.scale(bg, (SCREEN_WIDTH, SCREEN_HEIGHT)) for bg in backgrounds]
 
 
@@ -149,9 +155,10 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Controls whether the player 2 input should or not be considered
     movement_enabled2 = True
 
+
     # Game level
     level = 1
-    last_minute = 0
+    first_lvl_up = 60
 
     # Pause Menu State
     paused = False
@@ -404,23 +411,23 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
         screen.blit(pause_img, (380, 5))
 
         # Update timer
-        elapsed_time = pygame.time.get_ticks() // 1000
-        minutes, seconds = divmod(elapsed_time, 60)  # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
-                                                    #The quotient --> minutes, and the remainder --> seconds
-                                                    # The result is unpacked into the minutes and seconds variables
-        timer_text = timer_font.render("{:02}:{:02}".format(minutes, seconds), True, WHITE)
+        minutes, seconds = divmod(updated_score, 60)
+        score_text = score_font.render("{:02}:{:02}".format(minutes, seconds), True, WHITE)
 
-        # Calculate the x-coordinate and center the text
-        timer_x = (SCREEN_WIDTH - timer_text.get_width()) // 2
-        screen.blit(timer_text, (timer_x, 0))
+        # Calculate the x-coordinate to center the text
+        score_x = (SCREEN_WIDTH - score_text.get_width()) // 2
+        screen.blit(score_text, (score_x, 5))
+
+
+
 
         # Level upgrade
-        if minutes > last_minute:
+        if updated_score == first_lvl_up:
             # Increase the level every minute
             level += 1
-            last_minute = minutes
+            first_lvl_up = first_lvl_up + 60
 
-            # Increase players speed
+            # Increase playerCar speed
             playerCar1.speed += 1
             playerCar2.speed += 1
 
@@ -436,15 +443,14 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
             screen.blit(level_text, (level_x, level_y))
 
             # Play level-up sound
-            if config.is_sound_enabled:
-                level_up.play()
+            level_up.play()
 
             pygame.display.flip()  # Update the full display Surface to the screen
 
             # Pause for 1 seconds
             pygame.time.wait(1000)
             # Clear the screen
-            screen.blit(resized_backgrounds[level - 1], (0, 0))
+            screen.blit(resized_backgrounds[(level - 1) % num_backgrounds], (0, 0))
             pygame.display.flip()
 
         # Update lives
@@ -458,6 +464,11 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
         # Draw and update messages
         messages_group.draw(screen)
         messages_group.update()
+
+        #Update score
+        score += 1
+        updated_score = score // 60
+
 
         pygame.display.flip()  # Refresh the screen
         clock.tick(60)  # 60 frame per millisecond
@@ -488,6 +499,7 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     BLACK = (0, 0, 0)
 
     # Font
+    score_font = pygame.font.SysFont('monospace', 20, bold=True)
     timer_font = pygame.font.SysFont('monospace', 20, bold=True)
     message_font = pygame.font.SysFont('monospace', 30, bold=True)
     level_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 150)
@@ -659,9 +671,15 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Variable to track the active power-up
     active_powerup = None
 
+    #Score
+    score = 0
+    updated_score = 0
+
+
     # Game level
     level = 1
-    last_minute = 0
+    first_lvl_up = 60
+
 
     # Winner
     winner = None
@@ -1185,24 +1203,23 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         screen.blit(pause_img, (380, 5))
 
         # Update timer
-        elapsed_time = pygame.time.get_ticks() // 1000
-        # divmod calculates the quotient and remainder when elapsed_time is divided by 60.
-        # The quotient --> minutes, and the remainder --> seconds
-        # The result is unpacked into the minutes and seconds variables
-        minutes, seconds = divmod(elapsed_time, 60)
-        timer_text = timer_font.render("{:02}:{:02}".format(minutes, seconds), True, WHITE)
+        minutes, seconds = divmod(updated_score, 60)
+        score_text = score_font.render("{:02}:{:02}".format(minutes, seconds), True, WHITE)
 
         # Calculate the x-coordinate to center the text
-        timer_x = (SCREEN_WIDTH - timer_text.get_width()) // 2
-        screen.blit(timer_text, (timer_x, 0))
+        score_x = (SCREEN_WIDTH - score_text.get_width()) // 2
+        screen.blit(score_text, (score_x, 5))
+
+
+
 
         # Level upgrade
-        if minutes > last_minute:
+        if updated_score == first_lvl_up:
             # Increase the level every minute
             level += 1
-            last_minute = minutes
+            first_lvl_up = first_lvl_up + 60
 
-            # Increase players speed
+            # Increase playerCar speed
             playerCar1.speed += 1
             playerCar2.speed += 1
 
@@ -1218,16 +1235,16 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             screen.blit(level_text, (level_x, level_y))
 
             # Play level-up sound
-            if config.is_sound_enabled:
-                level_up.play()
+            level_up.play()
 
             pygame.display.flip()  # Update the full display Surface to the screen
 
             # Pause for 1 seconds
             pygame.time.wait(1000)
-            # Clear the screen
+            #Clear the screen
             screen.blit(background, (0, 0))
             pygame.display.flip()
+
 
         # Update lives
         # Player 1 lives
@@ -1240,6 +1257,10 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         # Draw and update messages
         messages_group.draw(screen)
         messages_group.update()
+
+        #Update score
+        score += 1
+        updated_score = score // 60
 
         pygame.display.flip()  # Refresh the screen
         clock.tick(60)  # 60 frame per millisecond
