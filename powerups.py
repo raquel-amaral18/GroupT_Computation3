@@ -49,6 +49,7 @@ class PowerUp(ABC, pygame.sprite.Sprite):
             reshape(self, road_x, lane_width):
                 reshapes the power-up icon with a new position and speed
     """
+
     def __init__(self, icon_path, width, initial_x):
         super().__init__()
         original_icon = pygame.image.load(icon_path)
@@ -68,7 +69,7 @@ class PowerUp(ABC, pygame.sprite.Sprite):
         self.message_font = pygame.font.SysFont('monospace', 30, bold=True)
 
     @abstractmethod
-    def affect_player(self, player, screen, messages_group):
+    def affect_player(self, player, screen, messages_group, enemy_player=None):
         pass
 
     @abstractmethod
@@ -76,7 +77,7 @@ class PowerUp(ABC, pygame.sprite.Sprite):
         pass
 
     @abstractmethod
-    def effect_over(self, player, traffic, screen):
+    def effect_over(self, player, traffic, screen, enemy_player=None):
         pass
 
     @abstractmethod
@@ -112,13 +113,13 @@ class Invincibility(PowerUp):  # Shield icon
         self.active = False
         self.active_time = None
 
-    def affect_player(self, player, screen, messages_group):
+    def affect_player(self, player, screen, messages_group, enemy_player=None):
         player.invincible = True
 
     def affect_traffic(self, traffic, messages_group):
         pass
 
-    def effect_over(self, player, traffic, screen):
+    def effect_over(self, player, traffic, screen, enemy_player=None):
         player.invincible = False
 
     def visual_effect(self, messages_group, player, text):
@@ -130,14 +131,12 @@ class SlowDown(PowerUp):  # Hourglass icon
         super().__init__(icon_path, width, initial_x)
         self.rect.y = random.randint(-2000, -1000)
         self.duration = 3000
-        self.start_time = 0
         self.active = False
         self.active_time = None
         self.powered_up = False
-        self.cooldown = 0
         self.message_color = (47, 151, 193)
 
-    def affect_player(self, player, screen, messages_group):
+    def affect_player(self, player, screen, messages_group, enemy_player=None):
         pass
 
     def affect_traffic(self, traffic, messages_group):
@@ -146,7 +145,7 @@ class SlowDown(PowerUp):  # Hourglass icon
             car.change_speed(random.randint(3, 5))
             self.visual_effect(messages_group, car, "Slow")
 
-    def effect_over(self, player, traffic, screen):
+    def effect_over(self, player, traffic, screen, enemy_player=None):
         for car in traffic:
             car.is_speed_reduced = False
             car.change_speed(random.randint(3, 5))
@@ -160,11 +159,10 @@ class RestoreLives(PowerUp):  # Heart icon
         super().__init__(icon_path, width, initial_x)
         self.rect.y = random.randint(-2000, -1000)
         self.duration = 0
-        self.start_time = 0
         self.active = False
         self.message_color = (249, 65, 68)
 
-    def affect_player(self, player, screen, messages_group):
+    def affect_player(self, player, screen, messages_group, enemy_player=None):
         player.lives += 1
         self.visual_effect(messages_group, player, "+1")
         # Since ExtraLife has no effect, this line doesn't allow it to enter the "Power up Timer" condition
@@ -174,7 +172,7 @@ class RestoreLives(PowerUp):  # Heart icon
         # No effect on traffic
         pass
 
-    def effect_over(self, player, traffic, screen):
+    def effect_over(self, player, traffic, screen, enemy_player=None):
         pass
 
     def visual_effect(self, messages_group, player, text):
@@ -189,14 +187,14 @@ class JetBomb(PowerUp):  # Fire icon
         self.active_time = None
         self.duration = 4000
 
-    def affect_player(self, player, screen, messages_group):
+    def affect_player(self, player, screen, messages_group, enemy_player=None):
         player.jet_bomb = True
 
     def affect_traffic(self, traffic, messages_group):
         # No effect on traffic
         pass
 
-    def effect_over(self, player, traffic, screen):
+    def effect_over(self, player, traffic, screen, enemy_player=None):
         player.jet_bomb = False
 
     def visual_effect(self, messages_group, player, text):
@@ -211,14 +209,12 @@ class SizeChange(PowerUp):
     def __init__(self, icon_path, width, initial_x):
         super().__init__(icon_path, width, initial_x)
         self.rect.y = random.randint(-2000, -1000)
-        self.duration = 5000
-        self.start_time = 0
         self.active = False
         self.active_time = None
         self.duration = 3000
         self.message_color = None
 
-    def affect_player(self, player, screen, messages_group):
+    def affect_player(self, player, screen, messages_group, enemy_player=None):
         aspect_ratio = player.original_image.get_width() / player.original_image.get_height()
         new_size = random.randint(0, 1)
         # If car Small
@@ -244,7 +240,7 @@ class SizeChange(PowerUp):
     def affect_traffic(self, traffic, messages_group):
         pass
 
-    def effect_over(self, player, traffic, screen):
+    def effect_over(self, player, traffic, screen, enemy_player=None):
         aspect_ratio = player.original_image.get_width() / player.original_image.get_height()
         # Restore car back to original size
         player.width = 60
@@ -253,6 +249,83 @@ class SizeChange(PowerUp):
         player.image = pygame.transform.scale(player.original_image, (player.width, player.height))
         player.mask = pygame.mask.from_surface(player.image)
         screen.blit(player.image, player.rect)
+
+    def visual_effect(self, messages_group, player, text):
+        show_message(messages_group, text, self.message_font, (player.rect.x, player.rect.y), self.message_color)
+
+
+"""
+    Negative Powerups for multiplayer
+"""
+
+
+class Invisible(PowerUp):
+    def __init__(self, icon_path, width, initial_x):
+        super().__init__(icon_path, width, initial_x)
+        self.rect.y = random.randint(-2000, -1000)
+        self.active = False
+        self.active_time = None
+        self.duration = 2000
+        self.message_color = (239, 230, 221)
+
+    def affect_player(self, player, screen, messages_group, enemy_player=None):
+        enemy_player.visible = False
+        self.visual_effect(messages_group, enemy_player, "Invisible")
+
+    def affect_traffic(self, traffic, messages_group):
+        # No effect on traffic
+        pass
+
+    def effect_over(self, player, traffic, screen, enemy_player=None):
+        enemy_player.visible = True
+
+    def visual_effect(self, messages_group, player, text):
+        show_message(messages_group, text, self.message_font, (player.rect.x, player.rect.y), self.message_color)
+
+
+class NoPowerUp(PowerUp):
+    def __init__(self, icon_path, width, initial_x):
+        super().__init__(icon_path, width, initial_x)
+        self.rect.y = random.randint(-2000, -1000)
+        self.active = False
+        self.active_time = None
+        self.duration = 4000
+        self.message_color = (249, 65, 68)
+
+    def affect_player(self, player, screen, messages_group, enemy_player=None):
+        enemy_player.can_catch_powerup = False
+        self.visual_effect(messages_group, enemy_player, "Blocked")
+
+    def affect_traffic(self, traffic, messages_group):
+        # No effect on traffic
+        pass
+
+    def effect_over(self, player, traffic, screen, enemy_player=None):
+        enemy_player.can_catch_powerup = True
+
+    def visual_effect(self, messages_group, player, text):
+        show_message(messages_group, text, self.message_font, (player.rect.x, player.rect.y), self.message_color)
+
+
+class KeyInversion(PowerUp):
+    def __init__(self, icon_path, width, initial_x):
+        super().__init__(icon_path, width, initial_x)
+        self.rect.y = random.randint(-2000, -1000)
+        self.active = False
+        self.active_time = None
+        self.duration = 3000
+        self.message_color = (225, 188, 41)
+
+    def affect_player(self, player, screen, messages_group, enemy_player=None):
+        enemy_player.key_inverse = True
+        self.visual_effect(messages_group, enemy_player, "Inverse")
+
+    def affect_traffic(self, traffic, messages_group):
+        # No effect on traffic
+        pass
+
+    def effect_over(self, player, traffic, screen, enemy_player=None):
+        enemy_player.key_inverse = False
 
     def visual_effect(self, messages_group, player, text):
         show_message(messages_group, text, self.message_font, (player.rect.x, player.rect.y), self.message_color)

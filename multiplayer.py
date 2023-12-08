@@ -4,7 +4,7 @@ import pygame
 import config
 
 from car import PlayerCar, IncomingCars
-from powerups import Invincibility, SlowDown, RestoreLives, JetBomb, SizeChange
+from powerups import Invincibility, SlowDown, RestoreLives, JetBomb, SizeChange, NoPowerUp, KeyInversion, Invisible
 
 from pause import display_pause_menu
 from button import Button
@@ -64,7 +64,7 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
     game_over_background = pygame.transform.scale(game_over_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
-    # RIBBON - PAUSE, TIMER AND LIFE COUNTER:
+    # RIBBON - PAUSE, SCORE AND LIFE COUNTER:
     # Pause button
     pause_img = pygame.image.load("Images/Extras/pause.png").convert()
     pause_img = pygame.transform.scale(pause_img, (20, 20))
@@ -74,8 +74,7 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
     heart_img = pygame.image.load("Images/Extras/heart.png").convert()
     heart_img = pygame.transform.scale(heart_img, (20, 20))
 
-
-    #Score
+    # Score
     score = 0
     updated_score = 0
 
@@ -154,7 +153,6 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
     movement_enabled1 = True
     # Controls whether the player 2 input should or not be considered
     movement_enabled2 = True
-
 
     # Game level
     level = 1
@@ -418,16 +416,13 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
         score_x = (SCREEN_WIDTH - score_text.get_width()) // 2
         screen.blit(score_text, (score_x, 5))
 
-
-
-
         # Level upgrade
         if updated_score == first_lvl_up:
             # Increase the level every minute
             level += 1
             first_lvl_up = first_lvl_up + 60
 
-            # Increase playerCar speed
+            # Increase players speed
             playerCar1.speed += 1
             playerCar2.speed += 1
 
@@ -443,7 +438,8 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
             screen.blit(level_text, (level_x, level_y))
 
             # Play level-up sound
-            level_up.play()
+            if config.is_sound_enabled:
+                level_up.play()
 
             pygame.display.flip()  # Update the full display Surface to the screen
 
@@ -465,10 +461,9 @@ def gameMP(SCREEN_WIDTH, SCREEN_HEIGHT):
         messages_group.draw(screen)
         messages_group.update()
 
-        #Update score
+        # Update score
         score += 1
         updated_score = score // 60
-
 
         pygame.display.flip()  # Refresh the screen
         clock.tick(60)  # 60 frame per millisecond
@@ -500,7 +495,6 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
     # Font
     score_font = pygame.font.SysFont('monospace', 20, bold=True)
-    timer_font = pygame.font.SysFont('monospace', 20, bold=True)
     message_font = pygame.font.SysFont('monospace', 30, bold=True)
     level_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 150)
     game_over_font = pygame.font.Font("Fonts/TT_Rounds_Neue_Compres_Bold.ttf", 150)
@@ -610,6 +604,9 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     power_up_jet_bomb = JetBomb("Images/PowerUps/jet_bomb.png", 50, selected_initial_left_x_pow)
     power_up_extra_life = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_left_x_pow)
     power_up_size_change = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_left_x_pow)
+    power_up_no_power_up = NoPowerUp("Images/PowerUps/no_powerup.png", 50, selected_initial_left_x_pow)
+    power_up_key_inversion = KeyInversion("Images/PowerUps/key_inversion.png", 50, selected_initial_left_x_pow)
+    power_up_invisible = Invisible("Images/PowerUps/invisible.png", 50, selected_initial_left_x_pow)
 
     incoming_powerups_list_left_road = pygame.sprite.Group()
 
@@ -628,21 +625,46 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     power_up_jet_bomb_right = JetBomb("Images/PowerUps/jet_bomb.png", 50, selected_initial_right_x_pow)
     power_up_extra_life_right = RestoreLives("Images/PowerUps/heart.png", 50, selected_initial_right_x_pow)
     power_up_size_change_right = SizeChange("Images/PowerUps/change_size.png", 50, selected_initial_right_x_pow)
+    power_up_no_power_up_right = NoPowerUp("Images/PowerUps/no_powerup.png", 50, selected_initial_right_x_pow)
+    power_up_key_inversion_right = KeyInversion("Images/PowerUps/key_inversion.png", 50, selected_initial_right_x_pow)
+    power_up_invisible_right = Invisible("Images/PowerUps/invisible.png", 50, selected_initial_right_x_pow)
 
     incoming_powerups_list_right_road = pygame.sprite.Group()
 
     # Add Objects to Lists
     all_sprites_list.add(playerCar1, playerCar2, car1, car2, car3, car4, car5, car6, car7, car8, power_up_invincibility,
-                         power_up_slowing, power_up_jet_bomb,
-                         power_up_extra_life, power_up_size_change)  # To show the moving objects on the screen
+                         power_up_slowing, power_up_jet_bomb, power_up_extra_life, power_up_size_change,
+                         power_up_invisible, power_up_no_power_up, power_up_key_inversion, power_up_invincibility_right,
+                         power_up_slowing_right, power_up_jet_bomb_right, power_up_extra_life_right,
+                         power_up_size_change_right, power_up_invisible_right, power_up_no_power_up_right,
+                         power_up_key_inversion_right)
     incoming_cars_list_left.add(car1, car2, car3, car4)
     incoming_cars_list_right.add(car5, car6, car7, car8)
     incoming_powerups_list_left_road.add(power_up_invincibility, power_up_slowing, power_up_jet_bomb,
-                                         power_up_extra_life, power_up_size_change)
+                                         power_up_extra_life, power_up_size_change, power_up_invisible,
+                                         power_up_no_power_up, power_up_key_inversion)
     incoming_powerups_list_right_road.add(power_up_invincibility_right, power_up_slowing_right, power_up_jet_bomb_right,
-                                          power_up_extra_life_right, power_up_size_change_right)
+                                          power_up_extra_life_right, power_up_size_change_right,
+                                          power_up_invisible_right, power_up_no_power_up_right,
+                                          power_up_key_inversion_right)
     player_car_list1.add(playerCar1)
     player_car_list2.add(playerCar2)
+
+    # GAME EXTRAS:
+
+    # Stored Powerup
+    stored_powerup_1 = None
+    stored_powerup_2 = None
+    activate_stored_powerup_1 = False
+    activate_stored_powerup_2 = False
+
+    # Stored Powerup Box
+    square_size = (80, 80)
+    rounded_square = pygame.Surface(square_size, pygame.SRCALPHA)
+    border_radius = 15
+    pygame.draw.rect(rounded_square, BLACK, rounded_square.get_rect(), border_radius=border_radius)
+    square_position_1 = (485, 50)
+    square_position_2 = (335, 50)
 
     # Powerup Bar
     max_powerup_bar_width = 170
@@ -671,15 +693,13 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
     # Variable to track the active power-up
     active_powerup = None
 
-    #Score
+    # Score
     score = 0
     updated_score = 0
-
 
     # Game level
     level = 1
     first_lvl_up = 60
-
 
     # Winner
     winner = None
@@ -735,39 +755,81 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
         if movement_enabled1:
             # Move player 1 car (with input from the user):
-            if keys[pygame.K_LEFT]:
-                playerCar1.moveLeft(5)
-                # Ensure the player's car stays within the left boundary of the right road
-                playerCar1.rect.x = max(road_x_right, playerCar1.rect.x)
-            if keys[pygame.K_RIGHT]:
-                playerCar1.moveRight(5)
-                # Ensure the player's car stays within the right boundary of the right road
-                playerCar1.rect.x = min(road_x_right + road_width - playerCar1.rect.width, playerCar1.rect.x)
-            if keys[pygame.K_UP]:
-                playerCar1.moveUp(5)
-                # Ensure the player's car stays within the top boundary of the road
-                playerCar1.rect.y = max(0, playerCar1.rect.y)
-            if keys[pygame.K_DOWN]:
-                playerCar1.moveDown(5)
+            if not playerCar1.key_inverse:
+                if keys[pygame.K_LEFT]:
+                    playerCar1.moveLeft(5)
+                    # Ensure the player's car stays within the left boundary of the right road
+                    playerCar1.rect.x = max(road_x_right, playerCar1.rect.x)
+                if keys[pygame.K_RIGHT]:
+                    playerCar1.moveRight(5)
+                    # Ensure the player's car stays within the right boundary of the right road
+                    playerCar1.rect.x = min(road_x_right + road_width - playerCar1.rect.width, playerCar1.rect.x)
+                if keys[pygame.K_UP]:
+                    playerCar1.moveUp(5)
+                    # Ensure the player's car stays within the top boundary of the road
+                    playerCar1.rect.y = max(0, playerCar1.rect.y)
+                if keys[pygame.K_DOWN]:
+                    playerCar1.moveDown(5)
+                # Key Inverse powerup activared
+            if playerCar1.key_inverse:
+                if keys[pygame.K_RIGHT]:
+                    playerCar1.moveLeft(5)
+                    # Ensure the player's car stays within the left boundary of the right road
+                    playerCar1.rect.x = max(road_x_right, playerCar1.rect.x)
+                if keys[pygame.K_LEFT]:
+                    playerCar1.moveRight(5)
+                    # Ensure the player's car stays within the right boundary of the right road
+                    playerCar1.rect.x = min(road_x_right + road_width - playerCar1.rect.width, playerCar1.rect.x)
+                if keys[pygame.K_DOWN]:
+                    playerCar1.moveUp(5)
+                    # Ensure the player's car stays within the top boundary of the road
+                    playerCar1.rect.y = max(0, playerCar1.rect.y)
+                if keys[pygame.K_UP]:
+                    playerCar1.moveDown(5)
                 # Ensure the player's car stays within the bottom boundary of the road
                 playerCar1.rect.y = min(SCREEN_HEIGHT - playerCar1.rect.height, playerCar1.rect.y)
+            if keys[pygame.K_RSHIFT] and stored_powerup_1 is not None:
+                # Activatrd powerup effect of stored powerup
+                activate_stored_powerup_1 = True
 
         if movement_enabled2:
             # Movement for player 2
-            if keys[pygame.K_a]:  # Left
-                playerCar2.moveLeft(5)
-                # Ensure the player's car stays within the left boundary of the left road
-                playerCar2.rect.x = max(road_x_left, playerCar2.rect.x)
-            if keys[pygame.K_d]:  # Right
-                playerCar2.moveRight(5)
-                # Ensure the player's car stays within the right boundary of the left road
-                playerCar2.rect.x = min(road_x_left + road_width - playerCar2.rect.width, playerCar2.rect.x)
-            if keys[pygame.K_w]:  # Up
-                playerCar2.moveUp(5)
-                playerCar2.rect.y = max(0, playerCar2.rect.y)
-            if keys[pygame.K_s]:  # Down
-                playerCar2.moveDown(5)
-                playerCar2.rect.y = min(SCREEN_HEIGHT - playerCar2.rect.height, playerCar2.rect.y)
+            if not playerCar2.key_inverse:
+                # Movement for player 2
+                if keys[pygame.K_a]:  # Left
+                    playerCar2.moveLeft(5)
+                    # Ensure the player's car stays within the left boundary of the left road
+                    playerCar2.rect.x = max(road_x_left, playerCar2.rect.x)
+                if keys[pygame.K_d]:  # Right
+                    playerCar2.moveRight(5)
+                    # Ensure the player's car stays within the right boundary of the left road
+                    playerCar2.rect.x = min(road_x_left + road_width - playerCar2.rect.width, playerCar2.rect.x)
+                if keys[pygame.K_w]:  # Up
+                    playerCar2.moveUp(5)
+                    playerCar2.rect.y = max(0, playerCar2.rect.y)
+                if keys[pygame.K_s]:  # Down
+                    playerCar2.moveDown(5)
+                    playerCar2.rect.y = min(SCREEN_HEIGHT - playerCar2.rect.height, playerCar2.rect.y)
+                # Key Inverse powerup activared
+            if playerCar2.key_inverse:
+                # Movement for player 2
+                if keys[pygame.K_d]:  # Left
+                    playerCar2.moveLeft(5)
+                    # Ensure the player's car stays within the left boundary of the left road
+                    playerCar2.rect.x = max(road_x_left, playerCar2.rect.x)
+                if keys[pygame.K_a]:  # Right
+                    playerCar2.moveRight(5)
+                    # Ensure the player's car stays within the right boundary of the left road
+                    playerCar2.rect.x = min(road_x_left + road_width - playerCar2.rect.width, playerCar2.rect.x)
+                if keys[pygame.K_s]:  # Up
+                    playerCar2.moveUp(5)
+                    playerCar2.rect.y = max(0, playerCar2.rect.y)
+                if keys[pygame.K_w]:  # Down
+                    playerCar2.moveDown(5)
+                    playerCar2.rect.y = min(SCREEN_HEIGHT - playerCar2.rect.height, playerCar2.rect.y)
+            if keys[pygame.K_LSHIFT] and stored_powerup_2 is not None:
+                # Activatrd powerup effect of stored powerup
+                activate_stored_powerup_2 = True
 
         # Draw background
         screen.blit(background, (0, 0))
@@ -802,6 +864,12 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             player_car_list1.draw(screen)
         if playerCar2.visible:
             player_car_list2.draw(screen)
+
+        # Blit Stored Powerup Box
+        if stored_powerup_1 is not None:  # boxes only appear if there are stored powerup
+            screen.blit(rounded_square, square_position_1)
+        if stored_powerup_2 is not None:
+            screen.blit(rounded_square, square_position_2)
 
         # Draw Power ups
         incoming_powerups_list_right_road.draw(screen)
@@ -848,9 +916,11 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     # Collision detected
                     playerCar1.lives -= 1
                     show_message(messages_group, "-1", message_font, (playerCar1.rect.x, playerCar1.rect.y), RED)
+                    # Car loses its powerup
+                    for powerup in incoming_powerups_list_right_road:
+                        powerup.effect_over(playerCar1, incoming_cars_list_right, screen, enemy_player=playerCar2)
                     # Activate invincibility for 5 seconds after collision
                     playerCar1.ghost = True
-                    print(playerCar2)
                     # playerCar.invincible is a check to not enter playerCar.ghost timer when we activate invincibility powerup
                     playerCar1.invincible = False
                     ghost_start_time_1 = pygame.time.get_ticks()
@@ -881,6 +951,9 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     # Collision detected
                     playerCar2.lives -= 1
                     show_message(messages_group, "-1", message_font, (playerCar2.rect.x, playerCar2.rect.y), RED)
+                    # Car loses its powerup
+                    for powerup in incoming_powerups_list_left_road:
+                        powerup.effect_over(playerCar2, incoming_cars_list_left, screen, enemy_player=playerCar1)
                     # Activate invincibility for 5 seconds after collision
                     playerCar2.ghost = True
                     # playerCar.invincible is a check to not enter playerCar.ghost timer when we activate invincibility powerup
@@ -946,9 +1019,8 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
         all_sprites_list.update()
 
-
         # Power up picker --> probability for Right Road:
-        if all(not powerup.active for powerup in incoming_powerups_list_right_road):
+        if all(not powerup.active for powerup in incoming_powerups_list_right_road) and stored_powerup_1 is None:
 
             spawn_prob = random.uniform(0, 100)
 
@@ -967,28 +1039,65 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             # Jet Bomb
             elif 50 <= spawn_prob <= 55:
                 power_up_jet_bomb_right.active = True
-
+            # Key Inversin
+            elif 80 <= spawn_prob <= 90:
+                power_up_key_inversion_right.active = True
+            # No powerup
+            elif 90 <= spawn_prob <= 95:
+                power_up_no_power_up_right.active = True
+            # Invisible
+            elif 95 <= spawn_prob <= 100:
+                power_up_invisible_right.active = True
 
         # Power up cycle for right road
         for powerup in incoming_powerups_list_right_road:
             # POWERUP contact with playerCar + respawn
             if powerup.active:
                 powerup.moveDown(powerup.speed)
+                if stored_powerup_1 is None:  # Make powerups stop when we have a stored one
+                    powerup.moveDown(powerup.speed)
 
-                if pygame.sprite.collide_mask(playerCar1, powerup) is not None:
+                if pygame.sprite.collide_mask(playerCar1, powerup) is not None and playerCar1.can_catch_powerup:
                     if config.is_sound_enabled:
                         catch_powerup.play()
                     powerup.powered_up = True
 
-                    if powerup.powered_up:
+                    if any(p.powered_up for p in incoming_powerups_list_right_road if
+                           p != powerup):  # Checks if any active power ups in list
+                        powerup.active = False
+                        powerup.powered_up = False
+                        stored_powerup_1 = powerup
+                        powerup.rect.x = square_position_1[0] + 15
+                        powerup.rect.y = square_position_1[1] + 15
+                        print('x')
+                    else:
                         powerup.active_time = pygame.time.get_ticks()
-                        powerup.affect_player(playerCar1, screen, messages_group)
+                        powerup.affect_player(playerCar1, screen, messages_group, enemy_player=playerCar2)
                         powerup.affect_traffic(incoming_cars_list_right, messages_group)
                         powerup.reshape(road_x_right, lane_width)
 
                 # Powerup isn't caught
                 elif powerup.rect.y >= SCREEN_HEIGHT:
                     powerup.reshape(road_x_right, lane_width)
+
+        # Activate Stored Powerup
+        for powerup in incoming_powerups_list_right_road:
+            if stored_powerup_1 and activate_stored_powerup_1:
+                # Activate the stored power-up
+                stored_powerup_1.powered_up = True
+                # Determines storage powerup starting time
+                stored_powerup_1.active_time = pygame.time.get_ticks()
+                # If player activates storage powerup before current powerup effect finishes. Current powerup effect ends
+                powerup.effect_over(playerCar1, incoming_cars_list_right, screen, enemy_player=playerCar2)
+                # Ativates storage powerup effect
+                stored_powerup_1.affect_player(playerCar1, screen, messages_group, enemy_player=playerCar2)
+                stored_powerup_1.affect_traffic(incoming_cars_list_right, messages_group)
+                # Makes storepowerup icon disappear
+                stored_powerup_1.reshape(road_x_right, lane_width)
+                # Clears the stored power-up after usage
+                stored_powerup_1 = None
+                # Deactivates Trigger
+                activate_stored_powerup_1 = False
 
         # Power up Timer --> when powerup ends, effect stops
         current_time = pygame.time.get_ticks()
@@ -1003,14 +1112,13 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     powerup_bar_width = max_powerup_bar_width * remaining_ratio
                 # Powerup effect time is over
                 else:
-                    powerup.effect_over(playerCar1, incoming_cars_list_right, screen)
+                    powerup.effect_over(playerCar1, incoming_cars_list_right, screen, enemy_player=playerCar2)
                     powerup.powered_up = False
 
                 # Make visual effect of slowing last 1 milisecond (since power up picked)
                 if elapsed_time < 100:
                     for car in incoming_cars_list_right:
-                        # Only works if power up slowing is caught
-                        if car.is_speed_reduced:
+                        if car.is_speed_reduced and car.slowing_mask is not None:
                             # Creates a blue mask on top of every incoming car (defined in car.reshape())
                             screen.blit(car.slowing_mask, (car.rect.x, car.rect.y))
                 # Makes cars return to normal speed before jet_bomb ends, since due to their high speed, playerCar
@@ -1043,6 +1151,16 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                         # velocidade aumenta à medida que os níveis sobem
                         powerup.speed = 10 + (level - 1) * 3
 
+        #  # NoPowerUp Effect
+        if not playerCar2.can_catch_powerup:
+            # Creates a red mask on top of player affected by NoPowerUp powerup
+            screen.blit(playerCar2.nopowerup_mask, (playerCar2.rect.x, playerCar2.rect.y))
+
+        # KeyInverse Effect
+        if playerCar2.key_inverse:
+            # Creates a yellow mask on top of player affected by KeyInverse powerup
+            screen.blit(playerCar2.key_inverse_mask, (playerCar2.rect.x, playerCar2.rect.y))
+
         # Invincibility Effect
         if playerCar1.invincible:
             screen.blit(playerCar1.mask_surface, (playerCar1.rect.x, playerCar1.rect.y))
@@ -1071,25 +1189,34 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             road_speed1 = 10
 
         # Power up picker --> probability for Left Road:
-        if all(not powerup.active for powerup in incoming_powerups_list_left_road):
+            if all(not powerup.active for powerup in incoming_powerups_list_left_road) and stored_powerup_2 is None:
 
-            spawn_prob = random.uniform(0, 100)
+                spawn_prob = random.uniform(0, 100)
 
-            # Hearts --> when activated (hearts only spawn when player needs them)
-            if (0 <= spawn_prob < 20 and playerCar2.lives == 1) or (0 <= spawn_prob < 5 and playerCar2.lives == 2):
-                power_up_extra_life.active = True
-            # Size Change
-            elif 20 <= spawn_prob < 35:
-                power_up_size_change.active = True
-            # Slow Down
-            elif 35 <= spawn_prob < 45:
-                power_up_slowing.active = True
-            # Invincibility
-            elif 45 <= spawn_prob <= 50:
-                power_up_invincibility.active = True
-            # Jet Bomb
-            elif 50 <= spawn_prob <= 55:
-                power_up_jet_bomb.active = True
+                # Hearts --> when activated (hearts only spawn when player needs them)
+                if (0 <= spawn_prob < 20 and playerCar2.lives == 1) or (0 <= spawn_prob < 5 and playerCar2.lives == 2):
+                    power_up_extra_life.active = True
+                # Size Change
+                elif 20 <= spawn_prob < 35:
+                    power_up_size_change.active = True
+                # Slow Down
+                elif 35 <= spawn_prob < 45:
+                    power_up_slowing.active = True
+                # Invincibility
+                elif 45 <= spawn_prob <= 50:
+                    power_up_invincibility.active = True
+                # Jet Bomb
+                elif 50 <= spawn_prob <= 55:
+                    power_up_jet_bomb.active = True
+                # Key Inversin
+                elif 85 <= spawn_prob <= 90:
+                    power_up_key_inversion.active = True
+                # No powerup
+                elif 90 <= spawn_prob <= 95:
+                    power_up_no_power_up.active = True
+                # Invisible
+                elif 95 <= spawn_prob <= 100:
+                    power_up_invisible.active = True
 
         # Power up cycle for Left road
         for powerup in incoming_powerups_list_left_road:
@@ -1097,21 +1224,48 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             # POWERUP contact with playerCar + respawn
             if powerup.active:
                 powerup.moveDown(powerup.speed)
+                if stored_powerup_2 is None:  # Make powerups stop when we have a stored one
+                    powerup.moveDown(powerup.speed)
 
-                if pygame.sprite.collide_mask(playerCar2, powerup) is not None:
+                if pygame.sprite.collide_mask(playerCar2, powerup) is not None and playerCar2.can_catch_powerup:
                     if config.is_sound_enabled:
                         catch_powerup.play()
                     powerup.powered_up = True
 
-                    if powerup.powered_up:
+                    if any(p.powered_up for p in incoming_powerups_list_left_road if p != powerup):  # Checks if any active power ups in list
+                        powerup.active = False
+                        powerup.powered_up = False
+                        stored_powerup_2 = powerup
+                        powerup.rect.x = square_position_2[0] + 15
+                        powerup.rect.y = square_position_2[1] + 15
+                    else:
                         powerup.active_time = pygame.time.get_ticks()
-                        powerup.affect_player(playerCar2, screen, messages_group)
+                        powerup.affect_player(playerCar2, screen, messages_group, enemy_player=playerCar1)
                         powerup.affect_traffic(incoming_cars_list_left, messages_group)
                         powerup.reshape(road_x_left, lane_width)
 
                 # Powerup isn't caught
                 elif powerup.rect.y >= SCREEN_HEIGHT:
                     powerup.reshape(road_x_left, lane_width)
+
+        # Activate Stored Powerup
+        for powerup in incoming_powerups_list_left_road:
+            if stored_powerup_2 and activate_stored_powerup_2:
+                # Activate the stored power-up
+                stored_powerup_2.powered_up = True
+                # Determines storage powerup starting time
+                stored_powerup_2.active_time = pygame.time.get_ticks()
+                # If player activates storage powerup before current powerup effect finishes. Current powerup effect ends
+                powerup.effect_over(playerCar2, incoming_cars_list_left, screen, enemy_player=playerCar1)
+                # Ativates storage powerup effect
+                stored_powerup_2.affect_player(playerCar2, screen, messages_group, enemy_player=playerCar1)
+                stored_powerup_2.affect_traffic(incoming_cars_list_left, messages_group)
+                # Makes storepowerup icon disappear
+                stored_powerup_2.reshape(road_x_left, lane_width)
+                # Clears the stored power-up after usage
+                stored_powerup_2 = None
+                # Deactivates Trigger
+                activate_stored_powerup_2 = False
 
         # Power up Timer --> when powerup ends, effect stops
         current_time = pygame.time.get_ticks()
@@ -1126,14 +1280,14 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                     powerup_bar_width = max_powerup_bar_width * remaining_ratio
                 # Powerup effect time is over
                 else:
-                    powerup.effect_over(playerCar2, incoming_cars_list_left, screen)
+                    powerup.effect_over(playerCar2, incoming_cars_list_left, screen, enemy_player=playerCar1)
                     powerup.powered_up = False
 
                 # Make visual effect of slowing last 1 milisecond (since power up picked)
                 if elapsed_time < 100:
                     for car in incoming_cars_list_left:
                         # Only works if power up slowing is caught
-                        if car.is_speed_reduced:
+                        if car.is_speed_reduced and car.slowing_mask is not None:
                             # Creates a blue mask on top of every incoming car (defined in car.reshape())
                             screen.blit(car.slowing_mask, (car.rect.x, car.rect.y))
                 # Makes cars return to normal speed before jet_bomb ends, since due to their high speed, playerCar
@@ -1166,6 +1320,15 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                         # velocidade aumenta à medida que os níveis sobem
                         powerup.speed = 10 + (level - 1) * 3
 
+        # NoPowerUp Effect
+        if not playerCar1.can_catch_powerup:
+            # Creates a red mask on top of player affected by NoPowerUp powerup
+            screen.blit(playerCar1.nopowerup_mask, (playerCar1.rect.x, playerCar1.rect.y))
+
+        # KeyInverse Effect
+        if playerCar1.key_inverse:
+            # Creates a yellow mask on top of player affected by KeyInverse powerup
+            screen.blit(playerCar1.key_inverse_mask, (playerCar1.rect.x, playerCar1.rect.y))
 
         # Invincibility Effect
         if playerCar2.invincible:
@@ -1210,16 +1373,13 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         score_x = (SCREEN_WIDTH - score_text.get_width()) // 2
         screen.blit(score_text, (score_x, 5))
 
-
-
-
         # Level upgrade
         if updated_score == first_lvl_up:
             # Increase the level every minute
             level += 1
             first_lvl_up = first_lvl_up + 60
 
-            # Increase playerCar speed
+            # Increase players speed
             playerCar1.speed += 1
             playerCar2.speed += 1
 
@@ -1235,16 +1395,16 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
             screen.blit(level_text, (level_x, level_y))
 
             # Play level-up sound
-            level_up.play()
+            if config.is_sound_enabled:
+                level_up.play()
 
             pygame.display.flip()  # Update the full display Surface to the screen
 
             # Pause for 1 seconds
             pygame.time.wait(1000)
-            #Clear the screen
+            # Clear the screen
             screen.blit(background, (0, 0))
             pygame.display.flip()
-
 
         # Update lives
         # Player 1 lives
@@ -1258,7 +1418,7 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         messages_group.draw(screen)
         messages_group.update()
 
-        #Update score
+        # Update score
         score += 1
         updated_score = score // 60
 

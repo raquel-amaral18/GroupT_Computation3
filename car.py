@@ -100,8 +100,10 @@ class PlayerCar(Car):
                 indicates if the player's car is currently powered up
             invincible: bool
                 indicates if the player's car is invincible
-            pac_man: bool
-                indicates if the player's car is in Pac-Man mode
+            jet_bomb: bool
+                indicates if the player's car is in JetBomb mode
+            can_catch_powerup: bool
+                indicates if player is affected by NoPowerUp powerup
 
         Methods
         -------
@@ -141,9 +143,13 @@ class PlayerCar(Car):
 
         self.powered_up = False
         self.invincible = False
-        self.pac_man = False
         self.jet_bomb = False
         self.mask_surface = self.mask.to_surface(setcolor=(255, 255, 255, 100), unsetcolor=(0, 0, 0, 0))  # unset, to transparent background
+
+        self.nopowerup_mask = self.mask.to_surface(setcolor=(249, 65, 68, 100), unsetcolor=(0, 0, 0, 0))
+        self.key_inverse_mask = self.mask.to_surface(setcolor=(225, 188, 41, 100), unsetcolor=(0, 0, 0, 0))
+        self.can_catch_powerup = True
+        self.key_inverse = False
 
     # The position of the car is (self.rect.x, self.rect.y)
     def moveRight(self, pixels):
