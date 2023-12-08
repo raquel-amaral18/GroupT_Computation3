@@ -1,9 +1,10 @@
-from game import game
+from interface import interface
 
 
 def main():
-    game()
+    interface()
 
 
 if __name__ == '__main__':
     main()
+

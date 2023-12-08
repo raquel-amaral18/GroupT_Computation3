@@ -136,7 +136,7 @@ Enhance your racing experience with these exciting powerups! Collect them during
 </div>
 
 - **Effect:** Gain temporary invincibility, protecting your car from collisions.
-- **Duration:** 10 seconds
+- **Duration:** 4 seconds
 
 <br>
 
@@ -147,7 +147,7 @@ Enhance your racing experience with these exciting powerups! Collect them during
 </div>
 
 - **Effect:** Force incoming cars to slow down, making it easier to navigate through the traffic.
-- **Duration:** 8 seconds
+- **Duration:** 3 seconds
 
 <br>
 
@@ -161,37 +161,25 @@ Enhance your racing experience with these exciting powerups! Collect them during
 
 <br>
 
-4. **Magnet:**
-
-<div style="text-align:center;">
-    <img src="Images/PowerUps/magnet.png" width="50">
-</div>
-
-- **Effect:** Attract nearby coins to boost your coin count.
-- **Duration:** 15 seconds
-
-<br>
-
-5. **Jet Bomb:**
+4. **Jet Bomb:**
 
 <div style="text-align:center;">
     <img src="Images/PowerUps/jet_bomb.png" width="50">
 </div>
 
 - **Effect:** Propel your car forward at high speed, causing explosions with incoming cars when you collide.
-- **Duration:** 5 seconds
-- **Time Warp:** Speed up the game clock by 2 times during the Jet Bomb activation.
+- **Duration:** 4 seconds
 
 <br>
 
-6. **Shrink:**
+5. **Shrink:**
 
 <div style="text-align:center;">
     <img src="Images/PowerUps/shrink.png" width="50">
 </div>
 
 - **Effect:** Decrease the size of your car, making it easier to navigate through tight spaces.
-- **Duration:** 8 seconds
+- **Duration:** 3 seconds
 
 > **Note:** You can catch multiple power-ups simultaneously, either of the same type for extended duration or different types for combined effects.
 
