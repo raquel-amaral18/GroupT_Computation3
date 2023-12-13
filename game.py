@@ -60,7 +60,6 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         level_up = pygame.mixer.Sound("Music&Sounds/level_up.wav")
         catch_powerup = pygame.mixer.Sound("Music&Sounds/catch_powerup.wav")
         jet_bomb = pygame.mixer.Sound("Music&Sounds/jet_bomb.mp3")
-        car_horn = pygame.mixer.Sound("Music&Sounds/car_horn.mp3")
 
     # GAME OVER
     # Background
@@ -226,10 +225,6 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         for event in pygame.event.get():  # It will return everything that the user inputs in a list (e.g.: mouse click)
             if event.type == pygame.QUIT or keys[pygame.K_ESCAPE]:  # pygame.QUIT checks if we pressed the red X
                 carryOn = False
-
-            if keys[pygame.K_SPACE]:
-                if config.is_sound_enabled:
-                    car_horn.play()
 
             # activate particle event
             if event.type == PARTICLE_EVENT:
@@ -404,7 +399,6 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
             if elapsed_time >= ghost_duration:
                 playerCar.ghost = False
                 playerCar.visible = True
-                movement_enabled = True
             else:
                 playerCar.visible = (elapsed_time // toggle_interval) % 2 == 0
 
@@ -419,7 +413,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
             if (0 <= spawn_prob < 20 and playerCar.lives == 1) or (0 <= spawn_prob < 5 and playerCar.lives == 2):
                 power_up_extra_life.active = True
             # Size Change
-            elif 20 <= spawn_prob < 35:
+            elif 20 <= spawn_prob < 27:
                 power_up_size_change.active = True
             # Slow Down
             elif 35 <= spawn_prob < 45:
@@ -428,7 +422,7 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
             elif 45 <= spawn_prob <= 50:
                 power_up_invincibility.active = True
             # Jet Bomb
-            elif 50 <= spawn_prob <= 55:
+            elif 50 <= spawn_prob <= 53:
                 power_up_jet_bomb.active = True
 
 
@@ -436,7 +430,6 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
         for powerup in incoming_powerups_list:
             # POWERUP contact with playerCar + respawn
             if powerup.active:
-                powerup.moveDown(powerup.speed)
                 if stored_powerup is None:  # Make powerups stop when we have a stored one
                     powerup.moveDown(powerup.speed)
 
@@ -452,7 +445,6 @@ def game(SCREEN_WIDTH, SCREEN_HEIGHT):
                             stored_powerup = powerup
                             powerup.rect.x = square_position[0] + 15
                             powerup.rect.y = square_position[1] + 15
-                            print('x')
                         else:
                             powerup.active_time = pygame.time.get_ticks()
                             powerup.affect_player(playerCar, screen, messages_group)

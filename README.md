@@ -102,7 +102,7 @@ Please note that these instructions are tailored for Windows users. If you are u
 #### Singleplayer mode:
 - Use **arrow keys** to move your car in the desired direction.
 - Other cars will be coming towards you from the opposite direction. To survive, you have to avoid colliding with them.
-- Collect **power-ups** for temporary advantages. You can hold up to two power-ups at a time. However, the second power-up will remain stored until you decide to use it. To use stored power-ups press **'Shift'+ 'L'**.
+- Collect **power-ups** for temporary advantages. You can hold up to two power-ups at a time. However, if the second power-up is different from the first, it will remain stored until you decide to use it. To use stored power-ups press **'Shift' (right)**.
 - You will also come across **coins**, which, if registered with a username, can be used to purchase cars from the store.
 - Bought cars will appear in your inventory, allowing you to select your preferred vehicle for gameplay. 
 
@@ -123,7 +123,7 @@ In this mode, players have two options to choose from:
    - The main goal will be to **survive longer** than the other player.
    - Each road presents different obstacles and opportunities for each player.
    - In this mode powerUps offer additional abilities when 'good' or impose temporary conditions on the opponent when 'bad'. 
-   - Each player can hold up to two power-ups at a time. However, the second power-up will remain stored until you decide to use it. To use stored power-ups press **'Shift'+ 'L'** if you are **Player 1** and **'Shift'+ 'R'** if you are **Player 2**.
+   - Each player can hold up to two power-ups at a time. However, if the second power-up is different from the first, it will remain stored until you decide to use it. To use stored power-ups press **'Shift' (right)** if you are **Player 1** and **'Shift' (left)** if you are **Player 2**.
 
   Invite a friend to play with you, and let the race begin! Will you be the ultimate champion of the roads?
 
@@ -217,7 +217,7 @@ In this mode, players have two options to choose from:
 - **Effect:** You can’t get new powerUps while it's active. 
 - **Duration:** 4 seconds
 
-> **Note:** You can hold up to two power-ups at a time. However, the second power-up will remain stored until you decide to use it. To use stored power-ups press **'Shift'+ 'L'** or **'Shift'+ 'R'**, if you are Player 2 in the multiplayer mode.
+> **Note:** You can hold up to two power-ups at a time. However, if the second power-up is different from the first, it will remain stored until you decide to use it. No more power-ups will be spawned if a power-up is already stored. This adds an element of decision-making, encouraging players to think strategically about when to use their stored power-ups.
 
 
 <!--OPEN ISSUES -->

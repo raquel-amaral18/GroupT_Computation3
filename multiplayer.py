@@ -1071,7 +1071,6 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
         for powerup in incoming_powerups_list_right_road:
             # POWERUP contact with playerCar + respawn
             if powerup.active:
-                powerup.moveDown(powerup.speed)
                 if stored_powerup_1 is None:  # Make powerups stop when we have a stored one
                     powerup.moveDown(powerup.speed)
 
@@ -1087,7 +1086,6 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
                         stored_powerup_1 = powerup
                         powerup.rect.x = square_position_1[0] + 15
                         powerup.rect.y = square_position_1[1] + 15
-                        print('x')
                     else:
                         powerup.active_time = pygame.time.get_ticks()
                         powerup.affect_player(playerCar1, screen, messages_group, enemy_player=playerCar2)
@@ -1241,7 +1239,6 @@ def gameMP2roads(SCREEN_WIDTH, SCREEN_HEIGHT):
 
             # POWERUP contact with playerCar + respawn
             if powerup.active:
-                powerup.moveDown(powerup.speed)
                 if stored_powerup_2 is None:  # Make powerups stop when we have a stored one
                     powerup.moveDown(powerup.speed)
 
